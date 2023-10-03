@@ -1,0 +1,29 @@
+{
+  "name": "unconventional",
+  "version": "0.0.1",
+  "description": "A complete server built on Cloudflare Pages Functions",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cloudflare-extension/unconventional.git"
+  },
+  "keywords": [
+    "cloudflare",
+    "pages",
+    "functions",
+    "workers",
+    "edge",
+    "server",
+    "express",
+    "crud"
+  ],
+  "author": "Dean Mauro",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cloudflare-extension/unconventional/issues"
+  },
+  "homepage": "https://github.com/cloudflare-extension/unconventional#readme"
+}
