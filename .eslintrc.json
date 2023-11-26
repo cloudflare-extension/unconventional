@@ -1,0 +1,77 @@
+{
+  "env": {
+    "node": true
+  },
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2020, // Allows for the parsing of modern ECMAScript features
+    "sourceType": "module" // Allows for the use of imports
+  },
+  "rules": {
+    // we want to force semicolons
+    "semi": [
+      "warn",
+      "always"
+    ],
+    "semi-spacing": [
+      "error",
+      {
+        "before": false,
+        "after": true
+      }
+    ],
+    // we use 2 spaces to indent our code
+    "indent": [
+      "warn",
+      2
+    ],
+    "comma-dangle": [
+      "warn",
+      "never"
+    ],
+    "comma-spacing": [
+      1,
+      {
+        "before": false,
+        "after": true
+      }
+    ],
+    "computed-property-spacing": [
+      "warn",
+      "never"
+    ],
+    "implicit-arrow-linebreak": [
+      "warn",
+      "beside"
+    ],
+    "no-lonely-if": "warn",
+    "no-unneeded-ternary": "warn",
+    "no-trailing-spaces": [
+      "warn",
+      {
+        "skipBlankLines": true,
+        "ignoreComments": true
+      }
+    ],
+    "no-multiple-empty-lines": [
+      1,
+      {
+        "max": 2,
+        "maxEOF": 0
+      }
+    ],
+    "key-spacing": [
+      "warn",
+      {
+        "beforeColon": false
+      }
+    ],
+    "keyword-spacing": [
+      "warn",
+      {
+        "before": true,
+        "after": true
+      }
+    ]
+  }
+}

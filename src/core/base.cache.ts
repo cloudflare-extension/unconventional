@@ -1,0 +1,111 @@
+import { CachePrefix, DefaultCacheTTL } from "../types/api.types";
+import { isEmpty } from "../utils/array.utils";
+import { sha256 } from "../utils/crypto.utils";
+import BaseModelClass from "./base.modelclass";
+
+export default class BaseCache {
+  private static kvKeySizeLimit = 512;
+
+  public static async get<T>(cache: KVNamespace, key: string): Promise<T | null> {
+    if (key.length > this.kvKeySizeLimit) return null;
+    const response = await cache.get(key);
+
+    if (!response) return null;
+
+    return JSON.parse(response) as T;
+  }
+
+  public static async set<T>(cache: KVNamespace, key: string, value: T, ttl: number = DefaultCacheTTL): Promise<void> {
+    key.length <= this.kvKeySizeLimit && await cache.put(key, JSON.stringify(value), { expirationTtl: ttl });
+  }
+
+  public static async delete(cache: KVNamespace, key: string): Promise<void> {
+    key.length <= this.kvKeySizeLimit && await cache.delete(key);
+  }
+
+  //#region Model Methods
+
+  /**  Sets a model in the cache. Use @param modifier for non-standard responses. */
+  public static async setModel<T extends BaseModelClass>(cache: KVNamespace, model: T, modifier?: object, ttl?: number): Promise<void> {
+    const identifier = model?.$id();
+    if (!identifier) return;
+
+    const modifierTag = await this.getModifier(modifier);
+
+    await this.set(cache, `${CachePrefix.Record}${model.constructor.name}:${identifier.toString()}:${modifierTag}`, model, ttl);
+
+    if (model.$key()) {
+      await this.set(cache, `${CachePrefix.Record}${model.constructor.name}:${model.$key()}:${modifierTag}`, model, ttl);
+    }
+  }
+
+  /** Gets a model from the cache. Use @param modifier for non-standard lookups. */
+  public static async getModel<U extends typeof BaseModelClass>(cache: KVNamespace, model: U, identifier: string | number, modifier?: object): Promise<InstanceType<U> | null> {
+    const modifierTag = await this.getModifier(modifier);
+
+    return await this.get(cache, `${CachePrefix.Record}${model.name}:${identifier.toString()}:${modifierTag}`);
+  }
+
+  /** Deletes a model from the cache. Deletes all modified versions too. */
+  public static async clearModel<T extends BaseModelClass>(cache: KVNamespace, model: T | undefined): Promise<void> {
+    if (!model) return;
+
+    const identifier = model?.$id();
+    if (!identifier) return;
+
+    // Delete by ID
+    const idList = await cache.list({ prefix: `${CachePrefix.Record}${model.constructor.name}:${identifier.toString()}` });
+    const idPromises = idList.keys.map(async key => {
+      await this.delete(cache, key.name);
+    });
+
+    // Delete by Key
+    let keyPromises: Promise<void>[] = [];
+    if (model.$key()) {
+      const keyList = await cache.list({ prefix: `${CachePrefix.Record}${model.constructor.name}:${model.$key()}` });
+
+      keyPromises = keyList.keys.map(async key => {
+        await this.delete(cache, key.name);
+      });
+    }
+
+    // Execute
+    await Promise.all([...idPromises, ...keyPromises]);
+  }
+  //#endregion
+
+
+  //#region Page Methods
+
+  /**  Sets a page in the cache. Use @param modifier for non-standard responses. */
+  public static async setPage<T extends BaseModelClass>(cache: KVNamespace, page: T[], modifier?: object, ttl?: number): Promise<void> {
+    if (!page.length) return;
+
+    const modifierTag = await this.getModifier(modifier);
+
+    await this.set(cache, `${CachePrefix.Page}${page[0].constructor.name}:${modifierTag}`, page, ttl);
+  }
+
+  /** Gets a page from the cache. Use @param modifier for non-standard lookups. */
+  public static async getPage<U extends typeof BaseModelClass>(cache: KVNamespace, model: U, modifier?: object): Promise<InstanceType<U>[] | null> {
+    const modifierTag = await this.getModifier(modifier);
+
+    return await this.get(cache, `${CachePrefix.Page}${model.name}:${modifierTag}`);
+  }
+
+  /** Deletes a page from the cache. Deletes all modified versions too. */
+  public static async clearPage<T extends typeof BaseModelClass>(cache: KVNamespace, model: T): Promise<void> {
+    const list = await cache.list({ prefix: `${CachePrefix.Page}${model.name}` });
+
+    Promise.all(list.keys.map(async key => {
+      await this.delete(cache, key.name);
+    }));
+  }
+  //#endregion
+
+
+  //#region Helpers
+  private static async getModifier(modifier: object | undefined) {
+    return modifier && !isEmpty(modifier) ? await sha256(JSON.stringify(modifier)) : "";
+  }
+}
