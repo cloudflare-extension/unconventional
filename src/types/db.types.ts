@@ -13,7 +13,7 @@ export enum SqlAction {
   Delete = 'DELETE'
 }
 
-export interface PGQuery extends QueryDefinition {
+export interface DBCall extends QueryDefinition {
   action: SqlAction;
   type: OneOrMany;
 }

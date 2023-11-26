@@ -1,5 +1,5 @@
 import { AndOr, ConflictResolution, Expansion, OneOrMany, SqlConflict, SqlDirection, SqlOrder, SqlPaginate, SqlWhere, SqlWhereOperator } from "unconventional-pg-queries";
-import { NullSqlOperators, PGQuery, ValidSortDirections, ValidSqlOperators, andOrPattern } from "../types/db.types";
+import { NullSqlOperators, DBCall, ValidSortDirections, ValidSqlOperators, andOrPattern } from "../types/db.types";
 import { RelationType } from "../types/decorator.types";
 import { parseExpandString, splitExpandUnit } from "../utils/api.utils";
 import { equalArrays } from "../utils/array.utils";
@@ -7,7 +7,7 @@ import { APIError } from "./api-error";
 import BaseModelClass from "./base.modelclass";
 
 /** Calls a PostgreSQL proxy worker to execute a SQL call */
-export async function pgFetch(service?: Fetcher, query?: PGQuery) {
+export async function pgFetch(service?: Fetcher, query?: DBCall) {
   if (!service) throw APIError.errTemporarilyUnavailable();
 
   const response = await service.fetch(new Request('http://worker/query', {
