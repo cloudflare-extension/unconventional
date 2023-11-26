@@ -11,16 +11,17 @@ export class BackendServer {
   constructor(config?: ServerConfig) {
     this._app = new Hono();
 
-    this.configure(config || { name: "default" });
+    if (config)
+      this.configure(config);
   }
 
   public get app() {
     return this._app;
   }
 
-  public configure(config: ServerConfig) {
+  public configure(config: ServerConfig = { name: 'default' }) {
     if (this.configured) throw new Error("Cannot reconfigure server");
-    
+
     // Base path
     if (config.basePath) this._app = this._app.basePath(config.basePath);
 
