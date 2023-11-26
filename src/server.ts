@@ -19,6 +19,8 @@ export class BackendServer {
   }
 
   public configure(config: ServerConfig) {
+    if (this.configured) throw new Error("Cannot reconfigure server");
+    
     // Base path
     if (config.basePath) this._app = this._app.basePath(config.basePath);
 
