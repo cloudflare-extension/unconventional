@@ -4,7 +4,7 @@ import { timestamp } from "../decorators/timestamp.decorator";
 import { SqlAction } from "../types/db.types";
 import { IndexSummary, PropSummary } from "../types/decorator.types";
 import { FilterConfig, PageConfig } from "./base.options";
-import { getConflict, getExpand, getOrder, getPage, getWhere, pgFetch } from "./postgres.connection";
+import { getConflict, getExpand, getOrder, getPage, getWhere, dbFetch } from "./postgres.connection";
 
 interface BaseModelSchema {
   indexes: IndexSummary[];
@@ -32,7 +32,7 @@ export default class BaseModelClass extends Document {
       createdAt: new Date()
     } : {};
 
-    const response = await pgFetch(this.db, {
+    const response = await dbFetch(this.db, {
       action: SqlAction.Insert,
       type: OneOrMany.One,
       table: this.collection,
@@ -52,7 +52,7 @@ export default class BaseModelClass extends Document {
       createdAt: new Date()
     } : {};
 
-    const response = await pgFetch(this.db, {
+    const response = await dbFetch(this.db, {
       action: SqlAction.Insert,
       type: OneOrMany.Many,
       table: this.collection,
@@ -67,7 +67,7 @@ export default class BaseModelClass extends Document {
   }
 
   public static async findById<T extends typeof BaseModelClass>(this: T, id: string | number, config?: FilterConfig): Promise<InstanceType<T> | null> {
-    const response = await pgFetch(this.db, {
+    const response = await dbFetch(this.db, {
       action: SqlAction.Select,
       type: OneOrMany.One,
       table: this.collection,
@@ -82,7 +82,7 @@ export default class BaseModelClass extends Document {
   }
 
   public static async findOne<T extends typeof BaseModelClass>(this: T, config: FilterConfig): Promise<InstanceType<T> | null> {
-    const response = await pgFetch(this.db, {
+    const response = await dbFetch(this.db, {
       action: SqlAction.Select,
       type: OneOrMany.One,
       table: this.collection,
@@ -96,7 +96,7 @@ export default class BaseModelClass extends Document {
   }
 
   public static async findMany<T extends typeof BaseModelClass>(this: T, config?: PageConfig & FilterConfig): Promise<Array<InstanceType<T>>> {
-    const response = await pgFetch(this.db, {
+    const response = await dbFetch(this.db, {
       action: SqlAction.Select,
       type: OneOrMany.Many,
       table: this.collection,
@@ -117,7 +117,7 @@ export default class BaseModelClass extends Document {
     const timestamp = this.schema.timestamped ? { updatedAt: new Date() } : {};
     delete data[this.idField];
 
-    const response = await pgFetch(this.db, {
+    const response = await dbFetch(this.db, {
       action: SqlAction.Update,
       type: OneOrMany.One,
       table: this.collection,
@@ -136,7 +136,7 @@ export default class BaseModelClass extends Document {
   public static async updateMany<T extends typeof BaseModelClass>(this: T, data: Partial<InstanceType<T>>[]): Promise<InstanceType<T>[] | null> {
     const timestamp = this.schema.timestamped ? { updatedAt: new Date() } : {};
 
-    const response = await pgFetch(this.db, {
+    const response = await dbFetch(this.db, {
       action: SqlAction.Update,
       type: OneOrMany.Many,
       table: this.collection,
@@ -150,7 +150,7 @@ export default class BaseModelClass extends Document {
   }
 
   public static async delete<T extends typeof BaseModelClass>(this: T, id: string): Promise<InstanceType<T> | null> {
-    const response = await pgFetch(this.db, {
+    const response = await dbFetch(this.db, {
       action: SqlAction.Delete,
       type: OneOrMany.One,
       table: this.collection,
@@ -166,7 +166,7 @@ export default class BaseModelClass extends Document {
   }
 
   public static async deleteMany<T extends typeof BaseModelClass>(this: T, config?: FilterConfig): Promise<InstanceType<T>[] | null> {
-    const response = await pgFetch(this.db, {
+    const response = await dbFetch(this.db, {
       action: SqlAction.Delete,
       type: OneOrMany.Many,
       table: this.collection,
@@ -182,7 +182,7 @@ export default class BaseModelClass extends Document {
   }
 
   public static async count<T extends typeof BaseModelClass>(this: T): Promise<number | null> {
-    const response = await pgFetch(this.db, {
+    const response = await dbFetch(this.db, {
       action: SqlAction.Select,
       type: OneOrMany.Many,
       table: this.collection,

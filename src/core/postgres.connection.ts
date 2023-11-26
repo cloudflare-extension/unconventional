@@ -7,7 +7,7 @@ import { APIError } from "./api-error";
 import BaseModelClass from "./base.modelclass";
 
 /** Calls a PostgreSQL proxy worker to execute a SQL call */
-export async function pgFetch(service?: Fetcher, query?: DBCall) {
+export async function dbFetch(service?: Fetcher, query?: DBCall) {
   if (!service) throw APIError.errTemporarilyUnavailable();
 
   const response = await service.fetch(new Request('http://worker/query', {
@@ -19,7 +19,7 @@ export async function pgFetch(service?: Fetcher, query?: DBCall) {
   return response;
 }
 
-export async function pgText(service?: Fetcher, text?: string) {
+export async function dbText(service?: Fetcher, text?: string) {
   if (!service) throw APIError.errTemporarilyUnavailable();
   if (!text) throw APIError.errBadRequest("No text provided");
 
