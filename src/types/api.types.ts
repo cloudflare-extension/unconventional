@@ -34,4 +34,4 @@ export type Env<V extends object = {}, B extends object = {}> = {
   Variables: Variables & V;
 }
 
-export interface BaseHandler<E extends Env = Env, P extends string = any, I extends Input = Input, O = {}> extends Handler<E, P, I, O> { }
+export interface BaseHandler<E extends Env = Env, P extends string = any, I extends Input = Input> extends Handler<E, P, I> { }

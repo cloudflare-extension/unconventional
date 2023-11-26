@@ -8,10 +8,10 @@
     "moduleResolution": "node",
     "esModuleInterop": true,
     "strict": true,
-    "incremental": false,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "sourceMap": false,
+    "declaration": true,
     "declarationMap": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
@@ -22,9 +22,7 @@
     "noImplicitUseStrict": false,
     "outDir": "./dist",
     "rootDir": "src",
-    "composite": true,
     "lib": [
-      "webworker",
       "ESNext"
     ],
     "types": [
