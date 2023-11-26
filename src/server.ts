@@ -1,10 +1,9 @@
 import { Hono } from "hono";
 import { handle } from "hono/cloudflare-pages";
-import { cors } from 'hono/cors';
 import { APIError } from "./core/api-error";
 import BaseModelClass from "./core/base.modelclass";
 import { Env } from "./types/api.types";
-import { ServerConfig } from "./types/server.types";
+import { ServerConfig, defaultCors } from "./types/server.types";
 
 export class BackendServer {
   private _app: Hono<Env, any, any>;
@@ -19,10 +18,7 @@ export class BackendServer {
     if (config)
       this.configure(config);
 
-    this._app.use(cors({
-      origin: "*",
-      allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
-    }));
+    this._app.use(defaultCors);
   }
 
   public get app() {
