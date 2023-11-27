@@ -1,10 +1,10 @@
 import { AndOr, ConflictResolution, Expansion, OneOrMany, SqlConflict, SqlDirection, SqlOrder, SqlPaginate, SqlWhere, SqlWhereOperator } from "unconventional-pg-queries";
 import { NullSqlOperators, ValidSortDirections, ValidSqlOperators, andOrPattern } from "../types/db.types";
 import { RelationType } from "../types/decorator.types";
-import { parseExpandString, splitExpandUnit } from "../utils/api.utils";
-import { equalArrays } from "../utils/array.utils";
-import { APIError } from "./api-error";
-import BaseModelClass from "./base.modelclass";
+import { parseExpandString, splitExpandUnit } from "./api.utils";
+import { equalArrays } from "./array.utils";
+import { APIError } from "../core/api-error";
+import BaseModelClass from "../core/base.modelclass";
 
 /** Converts a stringified list of relational fields to an array of data needed to expand those fields in a SQL environment  */
 export function getExpand<T extends typeof BaseModelClass>(model: T, expand?: string): Record<string, Expansion> {

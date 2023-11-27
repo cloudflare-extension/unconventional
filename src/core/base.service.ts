@@ -3,7 +3,7 @@ import { APIError } from "./api-error";
 import BaseCache from "./base.cache";
 import BaseModelClass from "./base.modelclass";
 import { FilterConfig, PageConfig, ServiceConfig } from "./base.options";
-import { buildFilter } from "./db.connection";
+import { buildFilter } from "../utils/db.utils";
 
 export default class BaseService<M extends typeof BaseModelClass> {
   private model: M;

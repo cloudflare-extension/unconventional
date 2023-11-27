@@ -4,7 +4,7 @@ import { timestamp } from "../decorators/timestamp.decorator";
 import { DB, SqlAction } from "../types/db.types";
 import { IndexSummary, PropSummary } from "../types/decorator.types";
 import { FilterConfig, PageConfig } from "./base.options";
-import { getConflict, getExpand, getOrder, getPage, getWhere } from "./db.connection";
+import { getConflict, getExpand, getOrder, getPage, getWhere } from "../utils/db.utils";
 
 interface BaseModelSchema {
   indexes: IndexSummary[];
