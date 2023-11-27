@@ -1,36 +1,10 @@
 import { AndOr, ConflictResolution, Expansion, OneOrMany, SqlConflict, SqlDirection, SqlOrder, SqlPaginate, SqlWhere, SqlWhereOperator } from "unconventional-pg-queries";
-import { NullSqlOperators, DBCall, ValidSortDirections, ValidSqlOperators, andOrPattern } from "../types/db.types";
+import { NullSqlOperators, ValidSortDirections, ValidSqlOperators, andOrPattern } from "../types/db.types";
 import { RelationType } from "../types/decorator.types";
 import { parseExpandString, splitExpandUnit } from "../utils/api.utils";
 import { equalArrays } from "../utils/array.utils";
 import { APIError } from "./api-error";
 import BaseModelClass from "./base.modelclass";
-
-/** Calls a PostgreSQL proxy worker to execute a SQL call */
-export async function dbFetch(service?: Fetcher, query?: DBCall) {
-  if (!service) throw APIError.errTemporarilyUnavailable();
-
-  const response = await service.fetch(new Request('http://worker/query', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(query)
-  }));
-
-  return response;
-}
-
-export async function dbText(service?: Fetcher, text?: string) {
-  if (!service) throw APIError.errTemporarilyUnavailable();
-  if (!text) throw APIError.errBadRequest("No text provided");
-
-  const response = await service.fetch(new Request('http://worker/text', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text })
-  }));
-
-  return response;
-}
 
 /** Converts a stringified list of relational fields to an array of data needed to expand those fields in a SQL environment  */
 export function getExpand<T extends typeof BaseModelClass>(model: T, expand?: string): Record<string, Expansion> {

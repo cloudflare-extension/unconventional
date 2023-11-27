@@ -1,6 +1,7 @@
 import { cors } from "hono/cors";
 import BaseModelClass from "../core/base.modelclass";
 import { APIError } from "../core";
+import { DBFactory } from "../types";
 
 /** Default CORS middleware permitting all origins and methods */
 export const defaultCors = cors({
@@ -9,11 +10,13 @@ export const defaultCors = cors({
 });
 
 /** Binds the database proxy to the BaseModel */
-export const bindDatabase = async (ctx, next) => {
-  if (!BaseModelClass.db)
-    BaseModelClass.db = ctx.env.DB_PROXY;
-
-  await next();
+export const bindDatabase = (getDB: DBFactory) => {
+  return async (ctx, next) => {
+    if (!BaseModelClass.db)
+      BaseModelClass.db = getDB(ctx);
+  
+    await next();
+  };
 };
 
 /** Catches and formats errors in a standard way */

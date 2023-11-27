@@ -19,14 +19,14 @@ export class BackendServer {
     return this._app;
   }
 
-  public configure(config: ServerConfig = { name: 'default' }) {
+  public configure(config: ServerConfig) {
     if (this.configured) throw new Error("Cannot reconfigure server");
 
     // Base path
     if (config.basePath) this._app = this._app.basePath(config.basePath);
 
     // Database binding
-    this._app.use(bindDatabase);
+    this._app.use(bindDatabase(config.getDB));
 
     // CORS
     this._app.use(defaultCors);

@@ -1,10 +1,10 @@
 import { ConflictResolution, OneOrMany, SqlWhereOperator } from "unconventional-pg-queries";
 import { prop } from "../decorators/prop.decorator";
 import { timestamp } from "../decorators/timestamp.decorator";
-import { SqlAction } from "../types/db.types";
+import { DB, SqlAction } from "../types/db.types";
 import { IndexSummary, PropSummary } from "../types/decorator.types";
 import { FilterConfig, PageConfig } from "./base.options";
-import { getConflict, getExpand, getOrder, getPage, getWhere, dbFetch } from "./db.connection";
+import { getConflict, getExpand, getOrder, getPage, getWhere } from "./db.connection";
 
 interface BaseModelSchema {
   indexes: IndexSummary[];
@@ -21,7 +21,7 @@ export default class BaseModelClass extends Document {
   public static idField: string = 'id';
   public static keyField?: string;
   public static ownerField?: string;
-  public static db?: Fetcher;
+  public static db: DB;
 
   @prop({ required: true, unique: true })
     id!: number;
@@ -32,7 +32,7 @@ export default class BaseModelClass extends Document {
       createdAt: new Date()
     } : {};
 
-    const response = await dbFetch(this.db, {
+    const response = await this.db.fetch<T>({
       action: SqlAction.Insert,
       type: OneOrMany.One,
       table: this.collection,
@@ -40,10 +40,10 @@ export default class BaseModelClass extends Document {
       data: this.addDefaults({ ...data, ...timestamp })
     });
 
-    if (!response.ok) return null;
+    if (!response) return null;
 
-    const body = await response.json<T>();
-    return this.fromDatabaseJson(body);
+    const result = Array.isArray(response) ? response[0] : response;
+    return this.fromDatabaseJson(result);
   }
 
   public static async createMany<T extends typeof BaseModelClass>(this: T, data: Partial<InstanceType<T>>[], upsertConstraint?: Array<keyof InstanceType<T>>): Promise<InstanceType<T>[] | null> {
@@ -52,7 +52,7 @@ export default class BaseModelClass extends Document {
       createdAt: new Date()
     } : {};
 
-    const response = await dbFetch(this.db, {
+    const response = await this.db.fetch<T[]>({
       action: SqlAction.Insert,
       type: OneOrMany.Many,
       table: this.collection,
@@ -60,14 +60,13 @@ export default class BaseModelClass extends Document {
       data: data.map(item => this.addDefaults({ ...item, ...timestamp }))
     });
 
-    if (!response.ok) return null;
+    if (!response) return null;
 
-    const body = await response.json<InstanceType<T>[]>();
-    return body.map(item => this.fromDatabaseJson(item));
+    return response.map(item => this.fromDatabaseJson(item));
   }
 
   public static async findById<T extends typeof BaseModelClass>(this: T, id: string | number, config?: FilterConfig): Promise<InstanceType<T> | null> {
-    const response = await dbFetch(this.db, {
+    const response = await this.db.fetch<T>({
       action: SqlAction.Select,
       type: OneOrMany.One,
       table: this.collection,
@@ -75,28 +74,23 @@ export default class BaseModelClass extends Document {
       where: [{ field: this.idField, operator: SqlWhereOperator.Eq, value: id }]
     });
 
-    if (!response.ok) return null;
-
-    const data = await response.json<T>();
-    return data ? this.fromDatabaseJson(data) : null;
+    return response ? this.fromDatabaseJson(response) : null;
   }
 
   public static async findOne<T extends typeof BaseModelClass>(this: T, config: FilterConfig): Promise<InstanceType<T> | null> {
-    const response = await dbFetch(this.db, {
+    const response = await this.db.fetch<T>({
       action: SqlAction.Select,
       type: OneOrMany.One,
       table: this.collection,
       expand: getExpand(this, config?.expand),
       where: getWhere(this, config?.filter)
     });
-    if (!response.ok) return null;
 
-    const data = await response.json<T>();
-    return data ? this.fromDatabaseJson(data) : null;
+    return response ? this.fromDatabaseJson(response) : null;
   }
 
   public static async findMany<T extends typeof BaseModelClass>(this: T, config?: PageConfig & FilterConfig): Promise<Array<InstanceType<T>>> {
-    const response = await dbFetch(this.db, {
+    const response = await this.db.fetch<T[]>({
       action: SqlAction.Select,
       type: OneOrMany.Many,
       table: this.collection,
@@ -107,17 +101,14 @@ export default class BaseModelClass extends Document {
       limit: config?.limit
     });
 
-    if (!response.ok) return [];
-
-    const data = await response.json<T[]>();
-    return data?.length ? data.map(item => this.fromDatabaseJson(item)) : [];
+    return response ? response.map(item => this.fromDatabaseJson(item)) : [];
   }
 
   public static async update<T extends typeof BaseModelClass>(this: T, id: string | number, data: Partial<InstanceType<T>>): Promise<InstanceType<T> | null> {
     const timestamp = this.schema.timestamped ? { updatedAt: new Date() } : {};
     delete data[this.idField];
 
-    const response = await dbFetch(this.db, {
+    const response = await this.db.fetch<T>({
       action: SqlAction.Update,
       type: OneOrMany.One,
       table: this.collection,
@@ -125,74 +116,65 @@ export default class BaseModelClass extends Document {
       data: { ...data, ...timestamp }
     });
 
-    if (!response.ok) return null;
+    if (!response) return null;
 
-    const body = await response.json<InstanceType<T> | InstanceType<T>[]>();
-    const result = Array.isArray(body) ? body[0] : body;
-
-    return result ? this.fromDatabaseJson(result) : null;
+    const result = Array.isArray(response) ? response[0] : response;
+    return this.fromDatabaseJson(result);
   }
 
   public static async updateMany<T extends typeof BaseModelClass>(this: T, data: Partial<InstanceType<T>>[]): Promise<InstanceType<T>[] | null> {
     const timestamp = this.schema.timestamped ? { updatedAt: new Date() } : {};
 
-    const response = await dbFetch(this.db, {
+    const response = await this.db.fetch<T[]>({
       action: SqlAction.Update,
       type: OneOrMany.Many,
       table: this.collection,
       data: data.map(item => ({ ...item, ...timestamp }))
     });
 
-    if (!response.ok) return null;
+    if (!response) return null;
 
-    const body = await response.json<InstanceType<T>[]>();
-    return body.map(item => this.fromDatabaseJson(item));
+    return response.map(item => this.fromDatabaseJson(item));
   }
 
   public static async delete<T extends typeof BaseModelClass>(this: T, id: string): Promise<InstanceType<T> | null> {
-    const response = await dbFetch(this.db, {
+    const response = await this.db.fetch<T>({
       action: SqlAction.Delete,
       type: OneOrMany.One,
       table: this.collection,
       where: [{ field: this.idField, operator: SqlWhereOperator.Eq, value: id }]
     });
 
-    if (!response.ok) return null;
+    if (!response) return null;
 
-    const body = await response.json<InstanceType<T> | InstanceType<T>[]>();
-    const result = Array.isArray(body) ? body[0] : body;
-
-    return result ? this.fromDatabaseJson(result) : null;
+    const result = Array.isArray(response) ? response[0] : response;
+    return this.fromDatabaseJson(result);
   }
 
   public static async deleteMany<T extends typeof BaseModelClass>(this: T, config?: FilterConfig): Promise<InstanceType<T>[] | null> {
-    const response = await dbFetch(this.db, {
+    const response = await this.db.fetch<T[]>({
       action: SqlAction.Delete,
       type: OneOrMany.Many,
       table: this.collection,
       where: getWhere(this, config?.filter)
     });
 
-    if (!response.ok) return null;
+    if (!response) return null;
 
-    const body = await response.json<InstanceType<T> | InstanceType<T>[]>();
-    const result = Array.isArray(body) ? body : [body];
-
-    return result ? result.map(item => this.fromDatabaseJson(item)) : null;
+    return response.map(item => this.fromDatabaseJson(item));
   }
 
   public static async count<T extends typeof BaseModelClass>(this: T): Promise<number | null> {
-    const response = await dbFetch(this.db, {
+    const response = await this.db.fetch<{ count: number }>({
       action: SqlAction.Select,
       type: OneOrMany.Many,
       table: this.collection,
       count: true
     });
 
-    if (!response.ok) return null;
+    if (!response) return null;
 
-    const body = await response.json<{ count: number }>();
-    return body.count;
+    return response.count;
   }
 
   public static fromDatabaseJson<T extends typeof BaseModelClass>(this: T, json: object): InstanceType<T> {
