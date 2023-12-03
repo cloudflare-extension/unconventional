@@ -24,7 +24,7 @@ export default class BaseService<M extends typeof BaseModelClass> {
    * @returns The newly created document.
    */
   public async create(data: Partial<InstanceType<M>>, config?: ServiceConfig<M>): Promise<InstanceType<M>> {
-    const response = await this.model.create(data, config?.upsertContraint);
+    const response = await this.model.create(data, config?.upsertConfig);
 
     if (!response) {
       throw APIError.errResourceCreationFailed(`Failed to create ${this.model.name}`);
@@ -42,7 +42,7 @@ export default class BaseService<M extends typeof BaseModelClass> {
    * @returns The newly created documents.
    */
   public async createMany(data: Partial<InstanceType<M>>[], config?: ServiceConfig<M>): Promise<InstanceType<M>[]> {
-    const response = await this.model.createMany(data, config?.upsertContraint);
+    const response = await this.model.createMany(data, config?.upsertConfig);
 
     if (!response) {
       throw APIError.errResourceCreationFailed(`Failed to create ${this.model.name}s`);

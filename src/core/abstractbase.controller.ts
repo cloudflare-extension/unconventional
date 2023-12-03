@@ -1,7 +1,7 @@
 import { Context } from "hono";
 import { BaseEnvKey, BaseHandler, Env, Query } from "../types/api.types";
 import BaseModelClass from "./base.modelclass";
-import { ControllerMethodOptions, ControllerOptions, DownloadMethodOptions, I, PI, RequestContext } from "./base.options";
+import { ControllerMethodOptions, ControllerOptions, DownloadMethodOptions, I, PI, RequestContext, ServiceConfig } from "./base.options";
 import BaseService from "./base.service";
 
 export default abstract class AbstractBaseController<M extends typeof BaseModelClass, E extends Env = Env> {
@@ -51,10 +51,12 @@ export default abstract class AbstractBaseController<M extends typeof BaseModelC
     }
 
     // Configure service
-    const config = {
+    const config: ServiceConfig<M> = {
       cache: this.getCache(ctx, this._options.cache, options?.cache),
       cacheTTL: this._options.cacheTTL ?? options?.cacheTTL,
-      upsertContraint: options?.upsertContraint
+      upsertConfig: {
+        constraint: options?.upsertContraint
+      }
     };
 
     // Request
@@ -91,10 +93,12 @@ export default abstract class AbstractBaseController<M extends typeof BaseModelC
     });
 
     // Configure service
-    const config = {
+    const config: ServiceConfig<M> = {
       cache: this.getCache(ctx, this._options.cache, options?.cache),
       cacheTTL: this._options.cacheTTL ?? options?.cacheTTL,
-      upsertContraint: options?.upsertContraint
+      upsertConfig: {
+        constraint: options?.upsertContraint
+      }
     };
 
     // Request

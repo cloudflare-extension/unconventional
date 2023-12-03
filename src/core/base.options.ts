@@ -1,3 +1,4 @@
+import { ConflictResolution } from "unconventional-pg-queries";
 import { Env } from "../types/api.types";
 import BaseModelClass from "./base.modelclass";
 
@@ -17,10 +18,15 @@ interface DownloadResponse {
   buffer: ArrayBufferLike;
 }
 
+export interface UpsertConfig<M extends typeof BaseModelClass> {
+  constraint?: Array<keyof InstanceType<M>>;
+  action?: ConflictResolution;
+}
+
 export interface ServiceConfig<M extends typeof BaseModelClass> {
   cache?: KVNamespace;
   cacheTTL?: number;
-  upsertContraint?: Array<keyof InstanceType<M>>;
+  upsertConfig?: UpsertConfig<M>;
 }
 
 /** The configuration for a BaseController */

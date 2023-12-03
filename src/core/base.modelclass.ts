@@ -3,7 +3,7 @@ import { prop } from "../decorators/prop.decorator";
 import { timestamp } from "../decorators/timestamp.decorator";
 import { DB, SqlAction } from "../types/db.types";
 import { IndexSummary, PropSummary } from "../types/decorator.types";
-import { FilterConfig, PageConfig } from "./base.options";
+import { FilterConfig, PageConfig, UpsertConfig } from "./base.options";
 import { getConflict, getExpand, getOrder, getPage, getWhere } from "../utils/db.utils";
 
 interface BaseModelSchema {
@@ -26,7 +26,7 @@ export default class BaseModelClass extends Document {
   @prop({ required: true, unique: true })
     id!: number;
 
-  public static async create<T extends typeof BaseModelClass>(this: T, data: Partial<InstanceType<T>>, upsertConstraint?: Array<keyof InstanceType<T>>): Promise<InstanceType<T> | null> {
+  public static async create<T extends typeof BaseModelClass>(this: T, data: Partial<InstanceType<T>>, upsertConfig?: UpsertConfig<T>): Promise<InstanceType<T> | null> {
     const timestamp = this.schema.timestamped ? {
       updatedAt: new Date(),
       createdAt: new Date()
@@ -36,7 +36,7 @@ export default class BaseModelClass extends Document {
       action: SqlAction.Insert,
       type: OneOrMany.One,
       table: this.collection,
-      conflict: getConflict(this, ConflictResolution.doUpdate, upsertConstraint),
+      conflict: getConflict(this, upsertConfig?.action || ConflictResolution.doUpdate, upsertConfig?.constraint),
       data: this.addDefaults({ ...data, ...timestamp })
     });
 
@@ -46,7 +46,7 @@ export default class BaseModelClass extends Document {
     return this.fromDatabaseJson(result);
   }
 
-  public static async createMany<T extends typeof BaseModelClass>(this: T, data: Partial<InstanceType<T>>[], upsertConstraint?: Array<keyof InstanceType<T>>): Promise<InstanceType<T>[] | null> {
+  public static async createMany<T extends typeof BaseModelClass>(this: T, data: Partial<InstanceType<T>>[], upsertConfig?: UpsertConfig<T>): Promise<InstanceType<T>[] | null> {
     const timestamp = this.schema.timestamped ? {
       updatedAt: new Date(),
       createdAt: new Date()
@@ -56,7 +56,7 @@ export default class BaseModelClass extends Document {
       action: SqlAction.Insert,
       type: OneOrMany.Many,
       table: this.collection,
-      conflict: getConflict(this, ConflictResolution.doUpdate, upsertConstraint),
+      conflict: getConflict(this, upsertConfig?.action || ConflictResolution.doUpdate, upsertConfig?.constraint),
       data: data.map(item => this.addDefaults({ ...item, ...timestamp }))
     });
 
