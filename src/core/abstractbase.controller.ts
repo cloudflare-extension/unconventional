@@ -3,6 +3,7 @@ import { BaseEnvKey, BaseHandler, Env, Query } from "../types/api.types";
 import BaseModel from "./base.model";
 import { ControllerMethodOptions, ControllerOptions, DownloadMethodOptions, I, PI, RequestContext, ServiceConfig } from "./base.options";
 import BaseService from "./base.service";
+import { JSONValue } from "hono/utils/types";
 
 export default abstract class AbstractBaseController<M extends typeof BaseModel, E extends Env = Env> {
   protected _model: M;
@@ -66,7 +67,7 @@ export default abstract class AbstractBaseController<M extends typeof BaseModel,
     if (options?.after) await options.after(reqContext, response);
 
     // Response
-    return ctx.json(response);
+    return ctx.json(response as any);
   }
 
   /**
@@ -149,7 +150,7 @@ export default abstract class AbstractBaseController<M extends typeof BaseModel,
     }
     else
       // Response
-      return ctx.json(response);
+      return ctx.json(response as any);
   }
 
   /**
@@ -218,7 +219,7 @@ export default abstract class AbstractBaseController<M extends typeof BaseModel,
     if (options?.after) await options.after(reqContext, response);
 
     // Response
-    return ctx.json(response);
+    return ctx.json(response as any);
   }
 
   /**

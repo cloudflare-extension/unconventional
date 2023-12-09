@@ -28,15 +28,15 @@
     "docs:serve": "vitepress serve docs"
   },
   "peerDependencies": {
-    "hono": "^3.10.2",
-    "unconventional-pg-queries": "^0.0.4"
+    "hono": "^3.11.4",
+    "unconventional-pg-queries": "^0.0.5"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20231121.0",
-    "@typescript-eslint/eslint-plugin": "^5.61.0",
-    "@typescript-eslint/parser": "^5.61.0",
-    "hono": "^3.10.2",
-    "typescript": "^5.0.4",
-    "unconventional-pg-queries": "^0.0.4"
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "@typescript-eslint/parser": "^5.62.0",
+    "hono": "^3.11.4",
+    "typescript": "^5.3.3",
+    "unconventional-pg-queries": "^0.0.5"
   }
 }
