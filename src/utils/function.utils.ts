@@ -9,7 +9,7 @@ interface CFFunctionDefinition {
 export type CFFunctionHandler = (config: CFFunctionDefinition) => PagesFunction<{}>;
 
 /** A Cloudflare Pages function handler configured with routes, a database connection, middleware, cors, and error handling OOTB. */
-const functionHandler: CFFunctionHandler = (config: CFFunctionDefinition) => {
+export const functionHandler: CFFunctionHandler = (config: CFFunctionDefinition) => {
   const server = new BackendServer();
   let handler: (eventContext: EventContext<{}, any, {}>) => Response | Promise<Response>;
 
@@ -24,5 +24,3 @@ const functionHandler: CFFunctionHandler = (config: CFFunctionDefinition) => {
     return await handler(eventContext);
   };
 };
-
-export default functionHandler;
