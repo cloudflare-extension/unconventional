@@ -3,7 +3,19 @@ import { handle } from "hono/cloudflare-pages";
 import type { Env } from "./types/api.types";
 import type { ServerConfig } from "./types/server.types";
 import { bindDatabase, defaultCors, defaultErrorHandler } from "./utils";
+import { cors } from "hono/cors";
 
+/** Backend server
+ * A wrapper around Hono that provides some default configuration
+ * and a simple interface for starting the server.
+ * 
+ * @example
+ * const server = new BackendServer({
+ *  name: "My Server",
+ *  basePath: "/api",
+ *  getDB: ctx => new DBProxy(ctx)
+ * });
+ */
 export class BackendServer {
   private _app: Hono<Env, any, any>;
   public configured: boolean = false;
@@ -29,13 +41,13 @@ export class BackendServer {
     this._app.use(bindDatabase(config.getDB));
 
     // CORS
-    this._app.use(defaultCors);
+    this._app.use(config.cors ? cors(config.cors) : defaultCors);
 
     // Error handling
     this._app.onError(defaultErrorHandler);
 
     // Standard middleware
-    if (config.standardMiddleware) this._app.use(...config.standardMiddleware);
+    if (config.middleware) this._app.use(...config.middleware);
 
     this.configured = true;
     return this;
