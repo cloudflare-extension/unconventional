@@ -1,4 +1,4 @@
-import { TimeStamped } from '../core/base.modelclass';
+import { TimeStamped } from '../core/base.model';
 import { TypedClassDecorator } from '../types/decorator.types';
 
 /**

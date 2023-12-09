@@ -1,4 +1,4 @@
-import BaseModelClass from '../core/base.modelclass';
+import BaseModel from '../core/base.model';
 import type { PropOptions } from '../types/decorator.types';
 
 /**
@@ -15,7 +15,7 @@ import type { PropOptions } from '../types/decorator.types';
  * }
  * ```
  */
-function prop<Target = any, Source extends typeof BaseModelClass = any, Pivot extends typeof BaseModelClass = any>(options?: PropOptions<Target, Source, Pivot>): PropertyDecorator {
+function prop<Target = any, Source extends typeof BaseModel = any, Pivot extends typeof BaseModel = any>(options?: PropOptions<Target, Source, Pivot>): PropertyDecorator {
   return (target: any, key: string | symbol) => {
     const parent = Object.getPrototypeOf(target.constructor);
     const child = target.constructor;

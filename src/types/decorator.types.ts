@@ -1,4 +1,4 @@
-import BaseModelClass from "../core/base.modelclass";
+import BaseModel from "../core/base.model";
 
 //#region General
 export declare type TypedClassDecorator<T> = (target: T) => T | void;
@@ -40,7 +40,7 @@ export enum RelationType {
 }
 
 /** Details of the pivot table connecting two models */
-export interface RelationPivot<T extends typeof BaseModelClass = any> {
+export interface RelationPivot<T extends typeof BaseModel = any> {
   /** The model to use for the pivot table */
   model: T;
   /** The field on this model related to the source */
@@ -49,7 +49,7 @@ export interface RelationPivot<T extends typeof BaseModelClass = any> {
   to: keyof InstanceType<T>;
 }
 
-export interface Relation<Target extends typeof BaseModelClass = any, Source extends typeof BaseModelClass = any, Pivot extends typeof BaseModelClass = any> {
+export interface Relation<Target extends typeof BaseModel = any, Source extends typeof BaseModel = any, Pivot extends typeof BaseModel = any> {
   /** The type of relation */
   type: RelationType;
   /** The model to relate to */
@@ -67,7 +67,7 @@ export interface Relation<Target extends typeof BaseModelClass = any, Source ext
 //#region Prop
 
 /** Options to pass to MongoDB when creating or validating a property */
-export interface PropOptions<T = any, S extends typeof BaseModelClass = any, P extends typeof BaseModelClass = any> {
+export interface PropOptions<T = any, S extends typeof BaseModel = any, P extends typeof BaseModel = any> {
   /**
    * Is this value required?
    * @default false
@@ -82,9 +82,9 @@ export interface PropOptions<T = any, S extends typeof BaseModelClass = any, P e
   /** Give the Property a default Value */
   default?: T | (() => T);
   /** Relational field data */
-  relation?: T extends typeof BaseModelClass ? Relation<T, S, P> : never;
+  relation?: T extends typeof BaseModel ? Relation<T, S, P> : never;
 }
 
 /** Type for the Values stored in the Reflection for Properties */
-export type PropSummary<Target = any, Source extends typeof BaseModelClass = any> = Record<keyof Source, PropOptions<Target, Source>>
+export type PropSummary<Target = any, Source extends typeof BaseModel = any> = Record<keyof Source, PropOptions<Target, Source>>
 //#endregion

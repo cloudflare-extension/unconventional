@@ -1,5 +1,5 @@
 import { cors } from "hono/cors";
-import BaseModelClass from "../core/base.modelclass";
+import BaseModel from "../core/base.model";
 import { APIError } from "../core";
 import { DBFactory } from "../types";
 
@@ -12,8 +12,8 @@ export const defaultCors = cors({
 /** Binds the database proxy to the BaseModel */
 export const bindDatabase = (getDB: DBFactory) => {
   return async (ctx, next) => {
-    if (!BaseModelClass.db)
-      BaseModelClass.db = getDB(ctx);
+    if (!BaseModel.db)
+      BaseModel.db = getDB(ctx);
   
     await next();
   };

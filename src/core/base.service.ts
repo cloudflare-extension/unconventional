@@ -1,11 +1,11 @@
 import { SqlWhereOperator } from "unconventional-pg-queries";
 import { APIError } from "./api-error";
 import BaseCache from "./base.cache";
-import BaseModelClass from "./base.modelclass";
+import BaseModel from "./base.model";
 import { FilterConfig, PageConfig, ServiceConfig } from "./base.options";
 import { buildFilter } from "../utils/db.utils";
 
-export default class BaseService<M extends typeof BaseModelClass> {
+export default class BaseService<M extends typeof BaseModel> {
   private model: M;
 
   /** A service providing CRUD methods for any Model */
@@ -14,7 +14,7 @@ export default class BaseService<M extends typeof BaseModelClass> {
   }
 
   /** Creates a service providing CRUD methods for any Model */
-  static for<M extends typeof BaseModelClass>(model: M) {
+  static for<M extends typeof BaseModel>(model: M) {
     return new this<M>(model);
   }
 

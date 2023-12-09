@@ -1,4 +1,4 @@
-import BaseModelClass from '../core/base.modelclass';
+import BaseModel from '../core/base.model';
 import { IndexDefinition, IndexOptions, TypedClassDecorator } from '../types/decorator.types';
 
 /**
@@ -11,7 +11,7 @@ import { IndexDefinition, IndexOptions, TypedClassDecorator } from '../types/dec
  * class ClassName {}
  * ```
  */
-export function index<T extends typeof BaseModelClass>(fields: IndexDefinition<InstanceType<T>>, options?: IndexOptions): TypedClassDecorator<T> {
+export function index<T extends typeof BaseModel>(fields: IndexDefinition<InstanceType<T>>, options?: IndexOptions): TypedClassDecorator<T> {
   return (target: T) => {
     target.schema.indexes.push({ definition: fields, options });
   };

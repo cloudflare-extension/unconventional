@@ -4,10 +4,10 @@ import { RelationType } from "../types/decorator.types";
 import { parseExpandString, splitExpandUnit } from "./api.utils";
 import { equalArrays } from "./array.utils";
 import { APIError } from "../core/api-error";
-import BaseModelClass from "../core/base.modelclass";
+import BaseModel from "../core/base.model";
 
 /** Converts a stringified list of relational fields to an array of data needed to expand those fields in a SQL environment  */
-export function getExpand<T extends typeof BaseModelClass>(model: T, expand?: string): Record<string, Expansion> {
+export function getExpand<T extends typeof BaseModel>(model: T, expand?: string): Record<string, Expansion> {
   if (!expand) return {};
 
   const propSummary = model.schema.props;
@@ -38,7 +38,7 @@ export function getExpand<T extends typeof BaseModelClass>(model: T, expand?: st
 }
 
 /** Converts a string of filters to an array of 'where' clause outlines for a SQL environment */
-export function getWhere<T extends typeof BaseModelClass>(model: T, filterString?: string): SqlWhere[] {
+export function getWhere<T extends typeof BaseModel>(model: T, filterString?: string): SqlWhere[] {
   if (!filterString) return [];
 
   const propSummary = model.schema.props;
@@ -85,7 +85,7 @@ export function getWhere<T extends typeof BaseModelClass>(model: T, filterString
 }
 
 /** Converts a stringified list of fields to order ascending or descending to an array of order data for a SQL environment */
-export function getOrder<T extends typeof BaseModelClass>(model: T, sort?: string): SqlOrder[] {
+export function getOrder<T extends typeof BaseModel>(model: T, sort?: string): SqlOrder[] {
   if (!sort) return [{ field: model.idField, direction: SqlDirection.Asc }];
 
   const propSummary = model.schema.props;
@@ -111,7 +111,7 @@ export function getOrder<T extends typeof BaseModelClass>(model: T, sort?: strin
   return orders;
 }
 
-export function getPage<T extends typeof BaseModelClass>(model: T, cursor?: string | number): SqlPaginate | undefined {
+export function getPage<T extends typeof BaseModel>(model: T, cursor?: string | number): SqlPaginate | undefined {
   if (!cursor) return undefined;
 
   const pagination = { field: model.idField, cursor };
@@ -119,7 +119,7 @@ export function getPage<T extends typeof BaseModelClass>(model: T, cursor?: stri
 }
 
 /** Retrieves all non-relational fields from a model for the 'returning' clause of a SQL call */
-export function getReturn<T extends typeof BaseModelClass>(model: T): string[] {
+export function getReturn<T extends typeof BaseModel>(model: T): string[] {
   const propSummary = model.schema.props;
   const fields: string[] = [];
 
@@ -130,7 +130,7 @@ export function getReturn<T extends typeof BaseModelClass>(model: T): string[] {
   return fields;
 }
 
-export function getConflict<T extends typeof BaseModelClass>(model: T, action: ConflictResolution, constraint?: Array<keyof InstanceType<T>>): SqlConflict | undefined {
+export function getConflict<T extends typeof BaseModel>(model: T, action: ConflictResolution, constraint?: Array<keyof InstanceType<T>>): SqlConflict | undefined {
   if (!constraint) return undefined;
   const indexes = model.schema.indexes;
 

@@ -16,7 +16,7 @@ export class Document {
   public static schema: BaseModelSchema = { indexes: [], props: {} };
 }
 
-export default class BaseModelClass extends Document {
+export default class BaseModel extends Document {
   public static collection: string;
   public static idField: string = 'id';
   public static keyField?: string;
@@ -26,7 +26,7 @@ export default class BaseModelClass extends Document {
   @prop({ required: true, unique: true })
     id!: number;
 
-  public static async create<T extends typeof BaseModelClass>(this: T, data: Partial<InstanceType<T>>, upsertConfig?: UpsertConfig<T>): Promise<InstanceType<T> | null> {
+  public static async create<T extends typeof BaseModel>(this: T, data: Partial<InstanceType<T>>, upsertConfig?: UpsertConfig<T>): Promise<InstanceType<T> | null> {
     const timestamp = this.schema.timestamped ? {
       updatedAt: new Date(),
       createdAt: new Date()
@@ -46,7 +46,7 @@ export default class BaseModelClass extends Document {
     return this.fromDatabaseJson(result);
   }
 
-  public static async createMany<T extends typeof BaseModelClass>(this: T, data: Partial<InstanceType<T>>[], upsertConfig?: UpsertConfig<T>): Promise<InstanceType<T>[] | null> {
+  public static async createMany<T extends typeof BaseModel>(this: T, data: Partial<InstanceType<T>>[], upsertConfig?: UpsertConfig<T>): Promise<InstanceType<T>[] | null> {
     const timestamp = this.schema.timestamped ? {
       updatedAt: new Date(),
       createdAt: new Date()
@@ -65,7 +65,7 @@ export default class BaseModelClass extends Document {
     return response.map(item => this.fromDatabaseJson(item));
   }
 
-  public static async findById<T extends typeof BaseModelClass>(this: T, id: string | number, config?: FilterConfig): Promise<InstanceType<T> | null> {
+  public static async findById<T extends typeof BaseModel>(this: T, id: string | number, config?: FilterConfig): Promise<InstanceType<T> | null> {
     const response = await this.db.fetch<T>({
       action: SqlAction.Select,
       type: OneOrMany.One,
@@ -77,7 +77,7 @@ export default class BaseModelClass extends Document {
     return response ? this.fromDatabaseJson(response) : null;
   }
 
-  public static async findOne<T extends typeof BaseModelClass>(this: T, config: FilterConfig): Promise<InstanceType<T> | null> {
+  public static async findOne<T extends typeof BaseModel>(this: T, config: FilterConfig): Promise<InstanceType<T> | null> {
     const response = await this.db.fetch<T>({
       action: SqlAction.Select,
       type: OneOrMany.One,
@@ -89,7 +89,7 @@ export default class BaseModelClass extends Document {
     return response ? this.fromDatabaseJson(response) : null;
   }
 
-  public static async findMany<T extends typeof BaseModelClass>(this: T, config?: PageConfig & FilterConfig): Promise<Array<InstanceType<T>>> {
+  public static async findMany<T extends typeof BaseModel>(this: T, config?: PageConfig & FilterConfig): Promise<Array<InstanceType<T>>> {
     const response = await this.db.fetch<T[]>({
       action: SqlAction.Select,
       type: OneOrMany.Many,
@@ -104,7 +104,7 @@ export default class BaseModelClass extends Document {
     return response ? response.map(item => this.fromDatabaseJson(item)) : [];
   }
 
-  public static async update<T extends typeof BaseModelClass>(this: T, id: string | number, data: Partial<InstanceType<T>>): Promise<InstanceType<T> | null> {
+  public static async update<T extends typeof BaseModel>(this: T, id: string | number, data: Partial<InstanceType<T>>): Promise<InstanceType<T> | null> {
     const timestamp = this.schema.timestamped ? { updatedAt: new Date() } : {};
     delete data[this.idField];
 
@@ -122,7 +122,7 @@ export default class BaseModelClass extends Document {
     return this.fromDatabaseJson(result);
   }
 
-  public static async updateMany<T extends typeof BaseModelClass>(this: T, data: Partial<InstanceType<T>>[]): Promise<InstanceType<T>[] | null> {
+  public static async updateMany<T extends typeof BaseModel>(this: T, data: Partial<InstanceType<T>>[]): Promise<InstanceType<T>[] | null> {
     const timestamp = this.schema.timestamped ? { updatedAt: new Date() } : {};
 
     const response = await this.db.fetch<T[]>({
@@ -137,7 +137,7 @@ export default class BaseModelClass extends Document {
     return response.map(item => this.fromDatabaseJson(item));
   }
 
-  public static async delete<T extends typeof BaseModelClass>(this: T, id: string): Promise<InstanceType<T> | null> {
+  public static async delete<T extends typeof BaseModel>(this: T, id: string): Promise<InstanceType<T> | null> {
     const response = await this.db.fetch<T>({
       action: SqlAction.Delete,
       type: OneOrMany.One,
@@ -151,7 +151,7 @@ export default class BaseModelClass extends Document {
     return this.fromDatabaseJson(result);
   }
 
-  public static async deleteMany<T extends typeof BaseModelClass>(this: T, config?: FilterConfig): Promise<InstanceType<T>[] | null> {
+  public static async deleteMany<T extends typeof BaseModel>(this: T, config?: FilterConfig): Promise<InstanceType<T>[] | null> {
     const response = await this.db.fetch<T[]>({
       action: SqlAction.Delete,
       type: OneOrMany.Many,
@@ -164,7 +164,7 @@ export default class BaseModelClass extends Document {
     return response.map(item => this.fromDatabaseJson(item));
   }
 
-  public static async count<T extends typeof BaseModelClass>(this: T): Promise<number | null> {
+  public static async count<T extends typeof BaseModel>(this: T): Promise<number | null> {
     const response = await this.db.fetch<{ count: number }>({
       action: SqlAction.Select,
       type: OneOrMany.Many,
@@ -177,13 +177,13 @@ export default class BaseModelClass extends Document {
     return response.count;
   }
 
-  public static fromDatabaseJson<T extends typeof BaseModelClass>(this: T, json: object): InstanceType<T> {
+  public static fromDatabaseJson<T extends typeof BaseModel>(this: T, json: object): InstanceType<T> {
     const model = new this();
     Object.assign(model, json);
     return model as InstanceType<T>;
   }
 
-  private static addDefaults<T extends typeof BaseModelClass>(this: T, data: Partial<InstanceType<T>>) {
+  private static addDefaults<T extends typeof BaseModel>(this: T, data: Partial<InstanceType<T>>) {
     Object.entries(this.schema.props).forEach(([key, options]) => {
       if (data[key] === undefined && options.default != null) {
         const val = options.default;
@@ -200,7 +200,7 @@ export default class BaseModelClass extends Document {
 }
 
 @timestamp()
-export abstract class TimeStamped extends BaseModelClass {
+export abstract class TimeStamped extends BaseModel {
   @prop()
   public createdAt?: Date;
   @prop()
