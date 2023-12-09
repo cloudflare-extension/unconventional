@@ -5,7 +5,7 @@ import type { ServerConfig } from "./types/server.types";
 import { bindDatabase, defaultCors, defaultErrorHandler } from "./utils";
 import { cors } from "hono/cors";
 
-/** Backend server
+/**
  * A wrapper around Hono that provides some default configuration
  * and a simple interface for starting the server.
  * 
