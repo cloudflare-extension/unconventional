@@ -1,15 +1,7 @@
 {
   "name": "unconventional",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A complete server built on Cloudflare Pages Functions",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/cloudflare-extension/unconventional.git"
-  },
   "keywords": [
     "cloudflare",
     "pages",
@@ -18,12 +10,46 @@
     "edge",
     "server",
     "express",
-    "crud"
+    "crud",
+    "rest",
+    "api"
   ],
   "author": "Dean Mauro",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cloudflare-extension/unconventional.git"
+  },
   "bugs": {
     "url": "https://github.com/cloudflare-extension/unconventional/issues"
   },
-  "homepage": "https://github.com/cloudflare-extension/unconventional#readme"
+  "homepage": "https://github.com/cloudflare-extension/unconventional#readme",
+  "files": [
+    "dist"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "clean": "tsc --build --clean",
+    "build": "rm -rf dist && tsc --build",
+    "watch": "tsc --watch",
+    "lint": "eslint . --ext js,jsx,ts,tsx",
+    "format": "eslint . --ext js,jsx,ts,tsx --fix",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs",
+    "docs:serve": "vitepress serve docs"
+  },
+  "peerDependencies": {
+    "hono": "^3.11.4",
+    "unconventional-pg-queries": "^0.0.5"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20231121.0",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "@typescript-eslint/parser": "^5.62.0",
+    "hono": "^3.11.4",
+    "typescript": "^5.3.3",
+    "unconventional-pg-queries": "^0.0.5"
+  }
 }
