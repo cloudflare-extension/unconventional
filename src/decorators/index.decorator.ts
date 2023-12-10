@@ -1,4 +1,4 @@
-import BaseModel from '../core/base.model';
+import { BaseModel } from '../core/base.model';
 import { IndexDefinition, IndexOptions, TypedClassDecorator } from '../types/decorator.types';
 
 /**

@@ -1,5 +1,5 @@
 import { cors } from "hono/cors";
-import BaseModel from "../core/base.model";
+import { BaseModel } from "../core/base.model";
 import { APIError } from "../core";
 import { DBFactory } from "../types";
 

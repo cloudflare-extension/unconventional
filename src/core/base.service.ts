@@ -1,11 +1,11 @@
 import { SqlWhereOperator } from "unconventional-pg-queries";
 import { APIError } from "./api-error";
-import BaseCache from "./base.cache";
-import BaseModel from "./base.model";
+import { BaseCache } from "./base.cache";
+import { BaseModel } from "./base.model";
 import { FilterConfig, PageConfig, ServiceConfig } from "./base.options";
 import { buildFilter } from "../utils/db.utils";
 
-export default class BaseService<M extends typeof BaseModel> {
+export class BaseService<M extends typeof BaseModel> {
   private model: M;
 
   /** A service providing CRUD methods for any Model */

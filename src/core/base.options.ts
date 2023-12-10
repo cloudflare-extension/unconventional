@@ -1,6 +1,6 @@
 import { ConflictResolution } from "unconventional-pg-queries";
 import { Env } from "../types/api.types";
-import BaseModel from "./base.model";
+import { BaseModel } from "./base.model";
 
 export interface PageConfig {
   limit?: number;

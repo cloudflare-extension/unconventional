@@ -4,7 +4,7 @@ import { RelationType } from "../types/decorator.types";
 import { parseExpandString, splitExpandUnit } from "./api.utils";
 import { equalArrays } from "./array.utils";
 import { APIError } from "../core/api-error";
-import BaseModel from "../core/base.model";
+import { BaseModel } from "../core/base.model";
 
 /** Converts a stringified list of relational fields to an array of data needed to expand those fields in a SQL environment  */
 export function getExpand<T extends typeof BaseModel>(model: T, expand?: string): Record<string, Expansion> {

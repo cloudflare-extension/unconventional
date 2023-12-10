@@ -16,7 +16,7 @@ export class Document {
   public static schema: BaseModelSchema = { indexes: [], props: {} };
 }
 
-export default class BaseModel extends Document {
+export class BaseModel extends Document {
   public static collection: string;
   public static idField: string = 'id';
   public static keyField?: string;

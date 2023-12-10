@@ -1,4 +1,4 @@
-import BaseModel from '../core/base.model';
+import { BaseModel } from '../core/base.model';
 import type { PropOptions } from '../types/decorator.types';
 
 /**

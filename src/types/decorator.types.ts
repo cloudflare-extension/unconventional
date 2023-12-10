@@ -1,4 +1,4 @@
-import BaseModel from "../core/base.model";
+import { BaseModel } from "../core/base.model";
 
 //#region General
 export declare type TypedClassDecorator<T> = (target: T) => T | void;

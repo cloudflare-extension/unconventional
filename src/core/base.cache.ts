@@ -1,9 +1,9 @@
 import { CachePrefix, DefaultCacheTTL } from "../types/api.types";
 import { isEmpty } from "../utils/array.utils";
 import { sha256 } from "../utils/crypto.utils";
-import BaseModel from "./base.model";
+import { BaseModel } from "./base.model";
 
-export default class BaseCache {
+export class BaseCache {
   private static kvKeySizeLimit = 512;
 
   public static async get<T>(cache: KVNamespace, key: string): Promise<T | null> {

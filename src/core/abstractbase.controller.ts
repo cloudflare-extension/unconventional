@@ -1,11 +1,10 @@
 import { Context } from "hono";
 import { BaseEnvKey, BaseHandler, Env, Query } from "../types/api.types";
-import BaseModel from "./base.model";
+import { BaseModel } from "./base.model";
 import { ControllerMethodOptions, ControllerOptions, DownloadMethodOptions, I, PI, RequestContext, ServiceConfig } from "./base.options";
-import BaseService from "./base.service";
-import { JSONValue } from "hono/utils/types";
+import { BaseService } from "./base.service";
 
-export default abstract class AbstractBaseController<M extends typeof BaseModel, E extends Env = Env> {
+export abstract class AbstractBaseController<M extends typeof BaseModel, E extends Env = Env> {
   protected _model: M;
   protected _service: BaseService<M>;
   protected _pageLimitDefault: number = 12;
