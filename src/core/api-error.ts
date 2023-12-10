@@ -44,14 +44,6 @@ export class APIError extends Error {
   public static errInvalidIdToken(data?: any, internalProperties?: any) {
     return new APIError('InvalidIdToken', 'Invalid Id Token', 401, data, internalProperties);
   }
-  public static errInvalidAuthToken(message?: string, data?: any, internalProperties?: any) {
-    message = message ? message : 'Invalid Auth Token';
-    return new APIError('InvalidAuthToken', message, 401, data, internalProperties);
-  }
-  public static errInvalidSessionToken(message?: string, data?: any, internalProperties?: any) {
-    message = message ? message : 'Invalid Session Token';
-    return new APIError('InvalidAuthToken', message, 401, data, internalProperties);
-  }
   public static errPermissionDenied(message?: string, data?: any, internalProperties?: any) {
     message = message ? message : "You don't have permission to perform this action.";
     return new APIError('Forbidden', message, 403, data, internalProperties);
@@ -71,6 +63,10 @@ export class APIError extends Error {
   }
   public static errResourceDeletionFailed(message: string, data?: any, internalProperties?: any) {
     return new APIError('ResourceDeletionFailed', message, 409, data, internalProperties);
+  }
+  public static errImATeapot(message?: string, data?: any, internalProperties?: any) {
+    message = message ? message : 'Short and stout';
+    return new APIError('ImATeapot', message, 418, data, internalProperties);
   }
   public static errFailedDependency(message?: string, data?: any, internalProperties?: any) {
     return new APIError('FailedDependency', message || 'Try again later.', 424, data, internalProperties);
