@@ -38,16 +38,16 @@ export class BackendServer {
     if (config.basePath) this._app = this._app.basePath(config.basePath);
 
     // Database binding
-    this._app.use(bindDatabase(config.getDB));
+    this._app.use('*', bindDatabase(config.getDB));
 
     // CORS
-    this._app.use(config.cors ? cors(config.cors) : defaultCors);
+    this._app.use('*', config.cors ? cors(config.cors) : defaultCors);
 
     // Error handling
     this._app.onError(defaultErrorHandler);
 
     // Standard middleware
-    if (config.middleware) this._app.use(...config.middleware);
+    if (config.middleware) this._app.use('*', ...config.middleware);
 
     this.configured = true;
     return this;
