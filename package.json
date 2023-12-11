@@ -1,6 +1,6 @@
 {
   "name": "unconventional",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "A complete server built on Cloudflare Pages Functions",
   "keywords": [
     "cloudflare",
