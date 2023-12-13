@@ -41,14 +41,14 @@
     "docs:serve": "vitepress serve docs"
   },
   "peerDependencies": {
-    "hono": "^3.11.4",
+    "hono": "^3.11.5",
     "unconventional-pg-queries": "^0.0.5"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20231121.0",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
-    "hono": "^3.11.4",
+    "hono": "^3.11.5",
     "typescript": "^5.3.3",
     "unconventional-pg-queries": "^0.0.5"
   }
