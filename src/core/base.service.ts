@@ -130,6 +130,7 @@ export class BaseService<M extends typeof BaseModel> {
     if (!response) {
       throw APIError.errNotFound(`No ${this.model.name} found with id ${identifier}`);
     } else if (config?.cache) {
+      await BaseCache.clearPage(config.cache, this.model);
       await BaseCache.clearModel(config.cache, response);
       await BaseCache.setModel(config.cache, response, undefined, config.cacheTTL);
     }
@@ -150,6 +151,7 @@ export class BaseService<M extends typeof BaseModel> {
     } else if (config?.cache) {
       const cache = config.cache;
 
+      await BaseCache.clearPage(cache, this.model);
       await Promise.all(response.map(item => BaseCache.clearModel(cache, item)));
       await Promise.all(response.map(item => BaseCache.setModel(cache, item, undefined, config.cacheTTL)));
     }
