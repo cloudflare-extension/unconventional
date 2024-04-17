@@ -66,7 +66,16 @@ export function getWhere<T extends typeof BaseModel>(model: T, filterString?: st
         operator = `${operator} ${value}`;
         value = null;
       }
+      if (operator.startsWith('ILIKE') || operator.startsWith('LIKE')) {
+        const operatorSplit = operator.split(' ');
 
+        if (operatorSplit.length > 1) {
+          // Handle cases where {value} is a text that includes a space
+          // ie "ILIKE Ash Ketchup"
+          operator = operatorSplit[0];
+          value = operatorSplit.slice(1).join(' ');
+        }
+      }
       // Handle JSON path
       if (field.includes('.')) {
         jsonPath = field.split('.');
