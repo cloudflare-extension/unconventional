@@ -56,14 +56,23 @@ export function getWhere<T extends typeof BaseModel>(model: T, filterString?: st
         andOr = AndOr.Or;
       }
 
-      let field = filter.substring(0, filter.indexOf(' '));
-      let value: string | null = filter.substring(filter.lastIndexOf(' ') + 1);
-      let operator = filter.substring(filter.indexOf(' ') + 1, filter.lastIndexOf(' '));
+      const singleQuoteIndex = filter.indexOf("'");
+      
+      const matchingOperators = singleQuoteIndex === -1 ?
+        ValidSqlOperators.filter(op => filter.includes(` ${op}`)) :
+        ValidSqlOperators.filter(op => filter.includes(` ${op}`) && filter.indexOf(` ${op}`) < singleQuoteIndex);
+      
+      if (!matchingOperators.length) throw APIError.errInvalidQueryParameter(`No valid operator in filter: '${filter}'`);
+      
+      // Handle when multiple operators are present in the filter (e.g. LIKE and NOT LIKE)
+      let operator = matchingOperators.sort((a, b) => b.length - a.length)[0];
+
+      let field = filter.substring(0, filter.indexOf(operator)).trim();
+      let value: string | null = filter.substring(filter.indexOf(operator) + operator.length).trim();
       let jsonPath: string[] = [];
 
       // Handle IS NULL and IS NOT NULL, which don't have values
       if (operator.startsWith('IS')) {
-        operator = `${operator} ${value}`;
         value = null;
       }
 
@@ -74,7 +83,6 @@ export function getWhere<T extends typeof BaseModel>(model: T, filterString?: st
       }
 
       if (!propSummary[field]) throw APIError.errInvalidQueryParameter(`Invalid filter: '${field}'`);
-      if (!ValidSqlOperators.includes(operator)) throw APIError.errInvalidQueryParameter(`Invalid operator in filter: '${operator}'`);
       if (!value && !NullSqlOperators.includes(operator)) throw APIError.errInvalidQueryParameter(`Invalid value in filter: '${value}'`);
 
       wheres.push({ field, jsonPath, operator: operator as SqlWhereOperator, value, andOr });
