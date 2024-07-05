@@ -4,7 +4,9 @@ import { sha256 } from "../utils/crypto.utils";
 import { BaseModel } from "./base.model";
 
 export class BaseCache {
-  private static kvKeySizeLimit = 512;
+  // https://developers.cloudflare.com/kv/platform/limits
+  private static kvKeySizeLimit = 512; // in bytes
+  private static kvValueSizeLimit = 26214400; // in bytes (25MB)
 
   public static async get<T>(cache: KVNamespace, key: string): Promise<T | null> {
     if (key.length > this.kvKeySizeLimit) return null;
@@ -16,7 +18,13 @@ export class BaseCache {
   }
 
   public static async set<T>(cache: KVNamespace, key: string, value: T, ttl: number = DefaultCacheTTL): Promise<void> {
-    key.length <= this.kvKeySizeLimit && await cache.put(key, JSON.stringify(value), { expirationTtl: ttl });
+    const keySize = this.getStringSizeInBytes(key);
+
+    const serializedValue = JSON.stringify(value);
+    const valueSize = this.getStringSizeInBytes(serializedValue);
+
+    keySize <= this.kvKeySizeLimit && valueSize <= this.kvValueSizeLimit &&
+      await cache.put(key, serializedValue, { expirationTtl: ttl });
   }
 
   public static async delete(cache: KVNamespace, key: string): Promise<void> {
@@ -108,4 +116,8 @@ export class BaseCache {
   private static async getModifier(modifier: object | undefined) {
     return modifier && !isEmpty(modifier) ? await sha256(JSON.stringify(modifier)) : "";
   }
-}
+
+  private static getStringSizeInBytes(value: string): number {
+    return new TextEncoder().encode(value).length;
+  }
+} ``
