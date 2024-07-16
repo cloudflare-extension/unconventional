@@ -1,5 +1,5 @@
 
-import { Handler, Input } from "hono";
+import { Handler, Input, Env as HonoEnv } from "hono";
 
 export enum Query {
   Expand = 'expand'
@@ -29,7 +29,7 @@ export type Variables = {
   [BaseEnvKey.isPrivileged]?: boolean;
 }
 
-export type Env<V extends object = {}, B extends object = {}> = {
+export type Env<V extends object = {}, B extends object = {}> = HonoEnv & {
   Bindings: Bindings & B;
   Variables: Variables & V;
 }
