@@ -106,13 +106,16 @@ export class BaseModel extends Document {
 
   public static async update<T extends typeof BaseModel>(this: T, id: string | number, data: Partial<InstanceType<T>>): Promise<InstanceType<T> | null> {
     const timestamp = this.schema.timestamped ? { updatedAt: new Date() } : {};
-    delete data[this.idField];
+    const targetField = isNaN(+id) ? this.keyField : this.idField;
+    if (!targetField) return null;
+
+    delete data[targetField];
 
     const response = await this.db.fetch<T>({
       action: SqlAction.Update,
       type: OneOrMany.One,
       table: this.collection,
-      where: [{ field: this.idField, operator: SqlWhereOperator.Eq, value: id }],
+      where: [{ field: targetField, operator: SqlWhereOperator.Eq, value: id }],
       data: { ...data, ...timestamp }
     });
 
@@ -137,12 +140,15 @@ export class BaseModel extends Document {
     return response.map(item => this.fromDatabaseJson(item));
   }
 
-  public static async delete<T extends typeof BaseModel>(this: T, id: string): Promise<InstanceType<T> | null> {
+  public static async delete<T extends typeof BaseModel>(this: T, id: string | number): Promise<InstanceType<T> | null> {
+    const targetField = isNaN(+id) ? this.keyField : this.idField;
+    if (!targetField) return null;
+
     const response = await this.db.fetch<T>({
       action: SqlAction.Delete,
       type: OneOrMany.One,
       table: this.collection,
-      where: [{ field: this.idField, operator: SqlWhereOperator.Eq, value: id }]
+      where: [{ field: targetField, operator: SqlWhereOperator.Eq, value: id }]
     });
 
     if (!response) return null;

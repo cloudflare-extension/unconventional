@@ -124,7 +124,7 @@ export class BaseService<M extends typeof BaseModel> {
    * @param data - An object containing all the fields to be modified and their new values.
    * @returns The updated document.
    */
-  public async update(identifier: string, data: Partial<InstanceType<M>>, config?: ServiceConfig<M>): Promise<InstanceType<M>> {
+  public async update(identifier: string | number, data: Partial<InstanceType<M>>, config?: ServiceConfig<M>): Promise<InstanceType<M>> {
     const response = await this.model.update(identifier, data);
 
     if (!response) {
@@ -161,10 +161,10 @@ export class BaseService<M extends typeof BaseModel> {
 
   /**
    * Deletes the document with the given identifier.
-   * @param identifier - The id or key of a document. If type is a valid MongoDB ObjectID, lookup will be done with the model's idColumn. Otherwise, keyColumn is used.
+   * @param identifier - The id or key of a document. If type is number, lookup will be done with the model's idColumn. Otherwise, keyColumn is used.
    * @returns The deleted document.
    */
-  public async delete(identifier: string, config?: ServiceConfig<M>): Promise<InstanceType<M>> {
+  public async delete(identifier: string | number, config?: ServiceConfig<M>): Promise<InstanceType<M>> {
     const response = await this.model.delete(identifier);
 
     if (!response) {
