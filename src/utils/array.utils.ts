@@ -1,18 +1,18 @@
 /** Compares two arrays and returns true if they contain the same elements, regardless of order */
-export const equalArrays = <T>(a: T[], b: T[]) => {
+export const equalArrays = <T>(a: T[], b: T[]): boolean => {
   if (a.length !== b.length) return false;
   const clone = [...b];
 
-  for (const key of a) {
-    const idx = b.indexOf(key);
-    if (idx > -1)
-      clone.splice(idx, 1);
-    else {
-      break;
+  for (const item of a) {
+    const idx = clone.indexOf(item); // Use clone here for checking
+    if (idx > -1) {
+      clone.splice(idx, 1); // Correctly removes the item from clone
+    } else {
+      return false; // If an item is not found, arrays are not equal
     }
   }
 
-  return clone.length === 0;
+  return clone.length === 0; // If clone is empty, arrays are equal
 };
 
 /** Checks whether an object has no keys and/or the value for every key is undefined */
