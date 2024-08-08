@@ -24,7 +24,7 @@ export class BaseModel extends Document {
   public static db: DB;
 
   @prop({ required: true, unique: true })
-    id!: number;
+    id!: number | string;
 
   public static async create<T extends typeof BaseModel>(this: T, data: Partial<InstanceType<T>>, upsertConfig?: UpsertConfig<T>): Promise<InstanceType<T> | null> {
     const timestamp = this.schema.timestamped ? {
