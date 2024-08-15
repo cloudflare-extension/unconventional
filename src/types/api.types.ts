@@ -25,7 +25,7 @@ export enum BaseEnvKey {
 };
 
 export type Variables = {
-  [BaseEnvKey.ownerId]?: number;
+  [BaseEnvKey.ownerId]?: string | number;
   [BaseEnvKey.isPrivileged]?: boolean;
 }
 
