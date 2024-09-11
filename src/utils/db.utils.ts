@@ -20,16 +20,17 @@ export function getExpand<T extends typeof BaseModel>(model: T, expand?: string)
     const relation = propSummary[parent]?.relation;
     if (!relation) throw APIError.errInvalidQueryParameter(`Invalid expansion: ${parent}`);
 
+    const relationModel = (relation.model.toString().startsWith('class')) ? relation.model : relation.model();
     expansions[parent] = {
       type: [RelationType.HasOne, RelationType.BelongsTo].includes(relation.type) ? OneOrMany.One : OneOrMany.Many,
       fromTable: model.collection,
       fromField: relation.from.toString(),
-      toTable: relation.model.collection,
+      toTable: relationModel.collection,
       toField: relation.to.toString(),
       throughTable: relation.through?.model.collection,
       throughFromField: relation.through?.from.toString(),
       throughToField: relation.through?.to.toString(),
-      expand: children ? getExpand(relation.model, children) : undefined
+      expand: children ? getExpand(relationModel, children) : undefined
     };
   });
 

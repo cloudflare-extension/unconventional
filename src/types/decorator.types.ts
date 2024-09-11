@@ -53,7 +53,7 @@ export interface Relation<Target extends typeof BaseModel = any, Source extends 
   /** The type of relation */
   type: RelationType;
   /** The model to relate to */
-  model: Target;
+  model: Target | (() => Target);
   /** The field on this model to use for the relation */
   from: keyof InstanceType<Source>;
   /** The field on the related model to use for the relation */
