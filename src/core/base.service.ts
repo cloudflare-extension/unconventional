@@ -91,7 +91,7 @@ export class BaseService<M extends typeof BaseModel> {
   /**
    * Gets all instances of the document
    * @param config - An object containing pagination and sorting options.
-   * @param config.limit - The maximum number of documents to return.
+   * @param config.limit - The maximum number of documents to return. Default 12. Negative limits return all documents.
    * @param config.cursor - The id of the document to start the query from.
    * @param config.sort - An object containing the fields to sort by and their sort order.
    * @param config.filters - A string containing the fields to filter by and their values.
@@ -106,7 +106,7 @@ export class BaseService<M extends typeof BaseModel> {
     }
 
     if (!page) {
-      const limit = modifiers.limit || 12;
+      const limit = modifiers.limit ? (modifiers.limit > 0 ? modifiers.limit : undefined) : 12;
 
       page = await this.model.findMany({ limit, ...modifiers });
 
