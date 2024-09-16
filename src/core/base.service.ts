@@ -108,7 +108,7 @@ export class BaseService<M extends typeof BaseModel> {
     if (!page) {
       const limit = modifiers.limit ? (modifiers.limit > 0 ? modifiers.limit : undefined) : 12;
 
-      page = await this.model.findMany({ limit, ...modifiers });
+      page = await this.model.findMany({ ...modifiers, limit });
 
       if (cache) {
         await BaseCache.setPage(cache, page, modifiers, cacheTTL);
