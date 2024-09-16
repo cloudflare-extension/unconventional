@@ -4,6 +4,7 @@ import { BaseCache } from "./base.cache";
 import { BaseModel } from "./base.model";
 import { FilterConfig, PageConfig, ServiceConfig } from "./base.options";
 import { buildFilter } from "../utils/db.utils";
+import { isUUID } from "../utils";
 
 export class BaseService<M extends typeof BaseModel> {
   private model: M;
@@ -70,7 +71,7 @@ export class BaseService<M extends typeof BaseModel> {
     }
 
     if (!entity) {
-      if (!isNaN(+identifier)) {
+      if (!isNaN(+identifier) || isUUID(`${identifier}`)) {
         entity = await this.model.findById(identifier, modifiers);
       } else {
         const keyFilter = buildFilter<M>(this.model.keyField as keyof M, SqlWhereOperator.Eq, identifier);

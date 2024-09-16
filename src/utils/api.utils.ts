@@ -65,9 +65,28 @@ export function replaceFilter(filter: string | string[] | undefined, target: str
   return otherFilters.join(' ');
 }
 
-/** Check if the filter has the specified target field. */
+/** Check whether the filter has the specified target field. */
 export function hasFilter(filter: string | string[] | undefined, target: string) {
   if (!filter) return false;
 
   return (filter as string).split(andOrPattern).some(x => x.startsWith(target));
+}
+
+/** Check whether a string is UUID */
+export function isUUID(str: string): boolean {
+  if (str.length !== 36) return false;
+  
+  for (let i = 0; i < str.length; i++) {
+    if (i === 8 || i === 13 || i === 18 || i === 23) {
+      if (str[i] !== '-') return false;
+    } else {
+      const charCode = str.charCodeAt(i);
+      const isDigit = charCode >= 48 && charCode <= 57; // 0-9
+      const isLowerHex = charCode >= 97 && charCode <= 102; // a-f
+      const isUpperHex = charCode >= 65 && charCode <= 70; // A-F
+      if (!isDigit && !isLowerHex && !isUpperHex) return false;
+    }
+  }
+  
+  return true;
 }

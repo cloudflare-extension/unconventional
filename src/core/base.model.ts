@@ -5,6 +5,7 @@ import { DB, SqlAction } from "../types/db.types";
 import { IndexSummary, PropSummary } from "../types/decorator.types";
 import { FilterConfig, PageConfig, UpsertConfig } from "./base.options";
 import { getConflict, getExpand, getOrder, getPage, getWhere } from "../utils/db.utils";
+import { isUUID } from "../utils";
 
 interface BaseModelSchema {
   indexes: IndexSummary[];
@@ -106,7 +107,7 @@ export class BaseModel extends Document {
 
   public static async update<T extends typeof BaseModel>(this: T, id: string | number, data: Partial<InstanceType<T>>): Promise<InstanceType<T> | null> {
     const timestamp = this.schema.timestamped ? { updatedAt: new Date() } : {};
-    const targetField = isNaN(+id) ? this.keyField : this.idField;
+    const targetField = this.getFieldName(id);
     if (!targetField) return null;
 
     delete data[targetField];
@@ -141,7 +142,7 @@ export class BaseModel extends Document {
   }
 
   public static async delete<T extends typeof BaseModel>(this: T, id: string | number): Promise<InstanceType<T> | null> {
-    const targetField = isNaN(+id) ? this.keyField : this.idField;
+    const targetField = this.getFieldName(id);
     if (!targetField) return null;
 
     const response = await this.db.fetch<T>({
@@ -198,6 +199,13 @@ export class BaseModel extends Document {
     });
 
     return data;
+  }
+
+  /** Gets the field name to use for the provided identifier */
+  private static getFieldName<T extends typeof BaseModel>(this: T, identifier: string | number) {
+    return !isNaN(+identifier) || isUUID(`${identifier}`)
+      ? this.idField
+      : this.keyField || undefined;
   }
 
   public $id() { return this[this.constructor['idField']]; }
