@@ -1,3 +1,9 @@
+### 1.5.0 (2024-09-16)
+
+##### New Features
+
+*  Allow BaseModel.id to be either a number or a UUID. ([980a8200](https://github.com/cloudflare-extension/unconventional/commit/980a82009cd48280c1a43fa5de85d2b27244c5ab))
+
 ### 1.4.2 (2024-09-16)
 
 ##### Other Changes
