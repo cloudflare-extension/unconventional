@@ -168,6 +168,8 @@ export abstract class AbstractBaseController<M extends typeof BaseModel, E exten
     let limit = parseInt(<string>queryParams.limit) || this._pageLimitDefault;
     if (limit > this._pageLimitMax && !options?.limitOverride)
       limit = this._pageLimitMax;
+    else if (limit < 0) 
+      limit = this._pageLimitDefault;
 
     // Request
     let response = await this._service.getAll({
