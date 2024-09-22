@@ -184,7 +184,7 @@ export class BaseModel extends Document {
     return response.count;
   }
 
-  public static async increment<T extends typeof BaseModel>(this: T, id: string | number, data: { [key in keyof InstanceType<T>]: number }): Promise<InstanceType<T> | null> {
+  public static async increment<T extends typeof BaseModel>(this: T, id: string | number, data: { [key in keyof InstanceType<T>]?: number }): Promise<InstanceType<T> | null> {
     const targetField = this.getFieldName(id);
     if (!targetField) return null;
 
