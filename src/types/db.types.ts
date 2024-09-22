@@ -11,7 +11,8 @@ export enum SqlAction {
   Select = 'SELECT',
   Insert = 'INSERT',
   Update = 'UPDATE',
-  Delete = 'DELETE'
+  Delete = 'DELETE',
+  Truncate = 'TRUNCATE'
 }
 
 export interface DBCall extends QueryDefinition {

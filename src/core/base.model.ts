@@ -1,4 +1,4 @@
-import { ConflictResolution, OneOrMany, SqlWhereOperator } from "unconventional-pg-queries";
+import { ConflictResolution, OneOrMany, SqlWhereOperator, SubAction } from "unconventional-pg-queries";
 import { prop } from "../decorators/prop.decorator";
 import { timestamp } from "../decorators/timestamp.decorator";
 import { DB, SqlAction } from "../types/db.types";
@@ -176,12 +176,39 @@ export class BaseModel extends Document {
       action: SqlAction.Select,
       type: OneOrMany.Many,
       table: this.collection,
-      count: true
+      subAction: SubAction.Count
     });
 
     if (!response) return null;
 
     return response.count;
+  }
+
+  public static async increment<T extends typeof BaseModel>(this: T, id: string | number, data: { [key in keyof InstanceType<T>]: number }): Promise<InstanceType<T> | null> {
+    const targetField = this.getFieldName(id);
+    if (!targetField) return null;
+
+    const response = await this.db.fetch<T>({
+      action: SqlAction.Update,
+      type: OneOrMany.One,
+      table: this.collection,
+      where: [{ field: targetField, operator: SqlWhereOperator.Eq, value: id }],
+      subAction: SubAction.Increment,
+      data
+    });
+
+    if (!response) return null;
+
+    const result = Array.isArray(response) ? response[0] : response;
+    return this.fromDatabaseJson(result);
+  }
+
+  public static async truncate<T extends typeof BaseModel>(this: T): Promise<void> {
+    await this.db.fetch<T>({
+      action: SqlAction.Truncate,
+      type: OneOrMany.Many,
+      table: this.collection
+    });
   }
 
   public static fromDatabaseJson<T extends typeof BaseModel>(this: T, json: object): InstanceType<T> {
