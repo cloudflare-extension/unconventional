@@ -1,5 +1,7 @@
 ### 1.8.0 (2024-09-23)
 
+*  Make createdAt and updatedAt field names customizable (e.g. created_at and updated_at). ([d05b6bf](https://github.com/cloudflare-extension/unconventional/commit/d05b6bf152baaf3f411c2e87cdff9749a8ba4621))
+
 ### 1.7.0 (2024-09-22)
 
 *  Add Truncate and Increment/Decrement methods to BaseModel. ([de7020e](https://github.com/cloudflare-extension/unconventional/commit/de7020e3acafd7385ff50bf47b186abac8b4962e))
