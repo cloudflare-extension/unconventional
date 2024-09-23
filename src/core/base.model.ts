@@ -10,7 +10,10 @@ import { isUUID } from "../utils";
 interface BaseModelSchema {
   indexes: IndexSummary[];
   props: PropSummary;
-  timestamped?: boolean;
+  timestamp?: {
+    createdField: string;
+    updatedField: string;
+  };
 }
 
 export class Document {
@@ -28,9 +31,9 @@ export class BaseModel extends Document {
     id!: number | string;
 
   public static async create<T extends typeof BaseModel>(this: T, data: Partial<InstanceType<T>>, upsertConfig?: UpsertConfig<T>): Promise<InstanceType<T> | null> {
-    const timestamp = this.schema.timestamped ? {
-      updatedAt: new Date(),
-      createdAt: new Date()
+    const timestamp = this.schema.timestamp ? {
+      [this.schema.timestamp.createdField]: new Date(),
+      [this.schema.timestamp.updatedField]: new Date()
     } : {};
 
     const response = await this.db.fetch<T>({
@@ -48,9 +51,9 @@ export class BaseModel extends Document {
   }
 
   public static async createMany<T extends typeof BaseModel>(this: T, data: Partial<InstanceType<T>>[], upsertConfig?: UpsertConfig<T>): Promise<InstanceType<T>[] | null> {
-    const timestamp = this.schema.timestamped ? {
-      updatedAt: new Date(),
-      createdAt: new Date()
+    const timestamp = this.schema.timestamp ? {
+      [this.schema.timestamp.createdField]: new Date(),
+      [this.schema.timestamp.updatedField]: new Date()
     } : {};
 
     const response = await this.db.fetch<T[]>({
@@ -106,7 +109,7 @@ export class BaseModel extends Document {
   }
 
   public static async update<T extends typeof BaseModel>(this: T, id: string | number, data: Partial<InstanceType<T>>): Promise<InstanceType<T> | null> {
-    const timestamp = this.schema.timestamped ? { updatedAt: new Date() } : {};
+    const timestamp = this.schema.timestamp ? { [this.schema.timestamp.updatedField]: new Date() } : {};
     const targetField = this.getFieldName(id);
     if (!targetField) return null;
 
@@ -127,7 +130,7 @@ export class BaseModel extends Document {
   }
 
   public static async updateMany<T extends typeof BaseModel>(this: T, data: Partial<InstanceType<T>>[]): Promise<InstanceType<T>[] | null> {
-    const timestamp = this.schema.timestamped ? { updatedAt: new Date() } : {};
+    const timestamp = this.schema.timestamp ? { [this.schema.timestamp.updatedField]: new Date() } : {};
 
     const response = await this.db.fetch<T[]>({
       action: SqlAction.Update,
@@ -241,7 +244,7 @@ export class BaseModel extends Document {
 }
 
 @timestamp()
-export abstract class TimeStamped extends BaseModel {
+export class TimeStamped extends BaseModel {
   @prop()
   public createdAt?: Date;
   @prop()

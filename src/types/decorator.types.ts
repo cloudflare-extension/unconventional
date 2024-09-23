@@ -66,7 +66,7 @@ export interface Relation<Target extends typeof BaseModel = any, Source extends 
 
 //#region Prop
 
-/** Options to pass to MongoDB when creating or validating a property */
+/** Options to pass to the DB when creating or validating a property */
 export interface PropOptions<T = any, S extends typeof BaseModel = any, P extends typeof BaseModel = any> {
   /**
    * Is this value required?
@@ -91,4 +91,16 @@ export interface PropOptions<T = any, S extends typeof BaseModel = any, P extend
 
 /** Type for the Values stored in the Reflection for Properties */
 export type PropSummary<Target = any, Source extends typeof BaseModel = any> = Record<keyof Source, PropOptions<Target, Source>>
+//#endregion
+
+
+//#region Timestamp
+
+/** Options to guide the timestamping of a model on create/update */
+export interface TimestampOptions {
+  /** The field to store the created date in */
+  createdField: string;
+  /** The field to store the updated date in */
+  updatedField: string;
+}
 //#endregion

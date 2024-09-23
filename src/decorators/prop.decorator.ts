@@ -22,7 +22,7 @@ function prop<Target = any, Source extends typeof BaseModel = any, Pivot extends
 
     if (child.schema === parent.schema) {
       child.schema = parent.schema
-        ? { indexes: [...parent.schema.indexes], props: {...parent.schema.props}, timestamped: parent.schema.timestamped }
+        ? { indexes: [...parent.schema.indexes], props: {...parent.schema.props}, timestamp: parent.schema.timestamp }
         : { indexes: [], props: {} };
     }
 
