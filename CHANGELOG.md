@@ -1,3 +1,5 @@
+### 1.8.0 (2024-09-23)
+
 ### 1.7.0 (2024-09-22)
 
 *  Add Truncate and Increment/Decrement methods to BaseModel. ([de7020e](https://github.com/cloudflare-extension/unconventional/commit/de7020e3acafd7385ff50bf47b186abac8b4962e))
