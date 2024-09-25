@@ -1,5 +1,7 @@
 ### 1.9.0 (2024-09-25)
 
+*  Fix timestamp pollution of parent models. ([e443297](https://github.com/cloudflare-extension/unconventional/commit/e443297f97cee4597989efa7437417495bff5887))
+
 ### 1.8.0 (2024-09-23)
 
 *  Make createdAt and updatedAt field names customizable (e.g. created_at and updated_at). ([d05b6bf](https://github.com/cloudflare-extension/unconventional/commit/d05b6bf152baaf3f411c2e87cdff9749a8ba4621))
