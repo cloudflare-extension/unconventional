@@ -10,7 +10,10 @@ import { TimestampOptions, TypedClassDecorator } from '../types/decorator.types'
  * ```
  */
 export function timestamp<T extends typeof BaseModel>(options?: TimestampOptions): TypedClassDecorator<T> {
-  return (target: T) => {
+  return (target: T) => {        // Ensure the target has its own schema object
+    if (!target.hasOwnProperty('schema'))
+      target.schema = Object.create(target.schema || {});
+
     target.schema.timestamp = {
       createdField: options?.createdField || 'createdAt',
       updatedField: options?.updatedField || 'updatedAt'
