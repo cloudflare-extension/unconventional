@@ -1,4 +1,4 @@
-### 1.9.0 (2024-09-25)
+### 1.9.1 (2024-09-25)
 
 *  Fix timestamp pollution of parent models. ([e443297](https://github.com/cloudflare-extension/unconventional/commit/e443297f97cee4597989efa7437417495bff5887))
 
