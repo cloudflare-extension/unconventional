@@ -1,3 +1,5 @@
+### 1.9.0 (2024-09-25)
+
 ### 1.8.0 (2024-09-23)
 
 *  Make createdAt and updatedAt field names customizable (e.g. created_at and updated_at). ([d05b6bf](https://github.com/cloudflare-extension/unconventional/commit/d05b6bf152baaf3f411c2e87cdff9749a8ba4621))
