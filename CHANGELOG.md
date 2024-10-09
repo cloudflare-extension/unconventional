@@ -1,3 +1,9 @@
+### 1.10.0 (2024-10-09)
+
+##### New Features
+
+*  Add maskPrivate method to Base Model, which can be used by the BaseController's maskPrivateFields method ([5099e232](https://github.com/cloudflare-extension/unconventional/commit/5099e23276f367dad26320e3a09064875bf32f23))
+
 ### 1.9.1 (2024-09-25)
 
 *  Fix timestamp pollution of parent models. ([e443297](https://github.com/cloudflare-extension/unconventional/commit/e443297f97cee4597989efa7437417495bff5887))
