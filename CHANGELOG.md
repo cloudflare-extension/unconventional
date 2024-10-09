@@ -41,3 +41,10 @@ Set the model field to `() => User` instead of `User`.
 @prop<typeof User>({ relation: { type: RelationType.BelongsTo, model: () => User, from: "user_id", to: "id" } })
   public owner?: User;
 ```
+
+### 1.1.0 (2024-08-08)
+
+##### Breaking Changes
+
+*  The type of `BaseModel.id` changed from `number` to `string | number` to allow for GUIDs as primary keys. ([23a70a6
+](https://github.com/cloudflare-extension/unconventional/commit/23a70a6d52cada8e6451b69d74ccdaf120faa3b5))
