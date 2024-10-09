@@ -5,7 +5,7 @@ import { DB, SqlAction } from "../types/db.types";
 import { IndexSummary, PropSummary } from "../types/decorator.types";
 import { FilterConfig, PageConfig, UpsertConfig } from "./base.options";
 import { getConflict, getExpand, getOrder, getPage, getWhere } from "../utils/db.utils";
-import { isUUID } from "../utils";
+import { getRelationModel, isUUID } from "../utils";
 
 interface BaseModelSchema {
   indexes: IndexSummary[];
@@ -236,6 +236,27 @@ export class BaseModel extends Document {
     return !isNaN(+identifier) || isUUID(`${identifier}`)
       ? this.idField
       : this.keyField || undefined;
+  }
+
+  /** Masks private fields and in the provided data and its relations */
+  public static maskPrivate<T extends typeof BaseModel>(this: T, data: InstanceType<T> | InstanceType<T>[], relationsOnly: boolean = false) {
+    if (!data || typeof data !== 'object') return;
+    const dataArray = Array.isArray(data) ? data : [data];
+    const propSummary = Object.entries(this.schema.props);
+
+    for (const item of dataArray) {
+      for (const [key, options] of propSummary) {
+        // Mask private fields. Skip 1st level if relationsOnly.
+        if (!relationsOnly && options.private && key in item) {
+          item[key] = undefined;
+        }
+
+        // Mask private fields in relations
+        if (options.relation && item[key]) {
+          (getRelationModel(options.relation) as typeof BaseModel).maskPrivate(item[key]);
+        }
+      }
+    }
   }
 
   public $id() { return this[this.constructor['idField']]; }

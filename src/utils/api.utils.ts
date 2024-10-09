@@ -1,5 +1,7 @@
 import { AndOr } from "unconventional-pg-queries";
 import { andOrPattern } from "../types/db.types";
+import { Relation } from "../types";
+import { BaseModel } from "../core/base.model";
 
 const defaultTarget = ',';
 const openBracket = '[';
@@ -89,4 +91,9 @@ export function isUUID(str: string): boolean {
   }
   
   return true;
+}
+
+/** Get the model class of a relation definition */
+export function getRelationModel<T extends typeof BaseModel>(relation: Relation<T>): T {
+  return (relation.model.toString().startsWith('class')) ? relation.model as T : (relation.model as () => T)();
 }

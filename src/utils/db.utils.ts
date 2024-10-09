@@ -1,7 +1,7 @@
 import { AndOr, ConflictResolution, Expansion, OneOrMany, SqlConflict, SqlDirection, SqlOrder, SqlPaginate, SqlWhere, SqlWhereOperator } from "unconventional-pg-queries";
 import { NullSqlOperators, ValidSortDirections, ValidSqlOperators, andOrPattern } from "../types/db.types";
 import { RelationType } from "../types/decorator.types";
-import { parseExpandString, splitExpandUnit } from "./api.utils";
+import { getRelationModel, parseExpandString, splitExpandUnit } from "./api.utils";
 import { equalArrays } from "./array.utils";
 import { APIError } from "../core/api-error";
 import { BaseModel } from "../core/base.model";
@@ -20,7 +20,7 @@ export function getExpand<T extends typeof BaseModel>(model: T, expand?: string)
     const relation = propSummary[parent]?.relation;
     if (!relation) throw APIError.errInvalidQueryParameter(`Invalid expansion: ${parent}`);
 
-    const relationModel = (relation.model.toString().startsWith('class')) ? relation.model : relation.model();
+    const relationModel = getRelationModel(relation);
     expansions[parent] = {
       type: [RelationType.HasOne, RelationType.BelongsTo].includes(relation.type) ? OneOrMany.One : OneOrMany.Many,
       fromTable: model.collection,
