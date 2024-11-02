@@ -5,6 +5,7 @@ Includes
 - Extensible CRUD methods
 - Database connection and operations
 - Middleware
+- Caching
 - CORS
 - Private field masking and IDOR protection
 - Error handling
