@@ -5,7 +5,7 @@ import { DB, SqlAction } from "../types/db.types";
 import { IndexSummary, PropSummary } from "../types/decorator.types";
 import { FilterConfig, PageConfig, UpsertConfig } from "./base.options";
 import { getConflict, getExpand, getOrder, getPage, getWhere } from "../utils/db.utils";
-import { getRelationModel, isUUID } from "../utils";
+import { evaluate, getRelationModel, isUUID } from "../utils";
 
 interface BaseModelSchema {
   indexes: IndexSummary[];
@@ -244,11 +244,17 @@ export class BaseModel extends Document {
     const dataArray = Array.isArray(data) ? data : [data];
     const propSummary = Object.entries(this.schema.props);
 
-    for (const item of dataArray) {
+    for (let item of dataArray) {
       for (const [key, options] of propSummary) {
         // Mask private fields. Skip 1st level if relationsOnly.
-        if (!relationsOnly && options.private && key in item) {
-          item[key] = undefined;
+        if (!relationsOnly && key in item && options.private != null) {
+          if (Array.isArray(item[key])) {
+            item[key] = item[key].filter(rel => !evaluate(options.private, item, rel));
+            if (item[key].length === 0) continue;
+          } else if (evaluate(options.private, item, item[key])) {
+            item[key] = undefined;
+            continue;
+          }
         }
 
         // Mask private fields in relations

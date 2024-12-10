@@ -20,3 +20,11 @@ export function isEmpty(obj: any) {
   for (const key in obj) if (obj[key] !== undefined) return false;
   return true;
 }
+
+/** Evaluate a direct or functional value */
+export function evaluate<T, F extends (...args: any[]) => T>(
+  value: T | F | undefined,
+  ...args: Parameters<F>
+): T | undefined {
+  return value instanceof Function ? value(...args) : value;
+}

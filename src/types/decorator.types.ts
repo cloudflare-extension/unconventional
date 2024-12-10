@@ -82,9 +82,15 @@ export interface PropOptions<T = any, S extends typeof BaseModel = any, P extend
   /** Give the Property a default Value */
   default?: T | (() => T);
   /** Protect field from edits by non-privileged users */
-  system?: boolean;
+  system?: boolean | ((
+    model: InstanceType<S>,
+    field: T extends typeof BaseModel ? InstanceType<T> : T
+  ) => boolean);
   /** Hide field in responses to non-privileged users */
-  private?: boolean;
+  private?: boolean | ((
+    model: InstanceType<S>,
+    field: T extends typeof BaseModel ? InstanceType<T> : T
+  ) => boolean);
   /** Relational field data */
   relation?: T extends typeof BaseModel ? Relation<T, S, P> : never;
 }
