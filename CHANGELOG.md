@@ -8,6 +8,16 @@
 
 * //github.com/cloudflare-extension/unconventional ([2665970a](https://github.com/cloudflare-extension/unconventional/commit/2665970aeb772143d728d189b6e9e573583f8494))
 
+### 1.12.0 (2024-12-10)
+
+##### New Features
+
+*  "Private" and "System" flags in the prop decorator now support functions. ([427f00bb](https://github.com/cloudflare-extension/unconventional/commit/427f00bbd3cf4f5ad16783e46aefc793862d8976))
+
+##### Other Changes
+
+* //github.com/cloudflare-extension/unconventional ([2665970a](https://github.com/cloudflare-extension/unconventional/commit/2665970aeb772143d728d189b6e9e573583f8494))
+
 ### 1.10.0 (2024-10-09)
 
 ##### New Features
