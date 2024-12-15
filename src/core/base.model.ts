@@ -247,7 +247,7 @@ export class BaseModel extends Document {
     for (let item of dataArray) {
       for (const [key, options] of propSummary) {
         // Mask private fields. Skip 1st level if relationsOnly.
-        if (!relationsOnly && key in item && options.private != null) {
+        if (!relationsOnly && item[key] != null && options.private != null) {
           if (Array.isArray(item[key])) {
             item[key] = item[key].filter(rel => rel != null && !evaluate(options.private, item, rel));
             if (item[key].length === 0) continue;
