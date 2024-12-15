@@ -1,3 +1,9 @@
+#### 1.13.2 (2024-12-15)
+
+##### Bug Fixes
+
+*  Fixed bug where privacy masking would throw an error if the field targeted was undefined ([c9d71505](https://github.com/cloudflare-extension/unconventional/commit/c9d715057a6894449720290591c8f714adecce53))
+
 #### 1.13.1 (2024-12-15)
 
 ### 1.13.0 (2024-12-15)
