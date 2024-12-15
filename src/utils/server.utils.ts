@@ -2,6 +2,8 @@ import { cors } from "hono/cors";
 import { BaseModel } from "../core/base.model";
 import { APIError } from "../core";
 import { DBFactory } from "../types";
+import { Context } from "hono";
+import { HTTPResponseError } from "hono/types";
 
 /** Default CORS middleware permitting all origins and methods */
 export const defaultCors = cors({
@@ -20,7 +22,7 @@ export const bindDatabase = (getDB: DBFactory) => {
 };
 
 /** Catches and formats errors in a standard way */
-export const defaultErrorHandler = (err, ctx) => {
+export const defaultErrorHandler = (err: Error | HTTPResponseError, ctx: Context) => {
   if (err instanceof APIError) {
     ctx.status(err.statusCode || 500);
 

@@ -19,3 +19,11 @@ export function Or<E extends Env = Env, P extends string = any, I extends Input 
     await next();
   };
 }
+
+/**
+ * Converts an array of relation paths into a nested expansion string
+ * @example buildExpansionString(['comments', 'post', 'user']) => 'comments[post[user]]'
+ */
+export function buildExpansionString(path: string[]): string {
+  return path.reduceRight((acc, curr) => acc ? `${curr}[${acc}]` : curr, '');
+}

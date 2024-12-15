@@ -1,3 +1,22 @@
+#### 1.13.2 (2024-12-15)
+
+##### Bug Fixes
+
+*  Fixed bug where privacy masking would throw an error if the field targeted was undefined ([c9d71505](https://github.com/cloudflare-extension/unconventional/commit/c9d715057a6894449720290591c8f714adecce53))
+
+#### 1.13.1 (2024-12-15)
+
+### 1.13.0 (2024-12-15)
+
+##### New Features
+
+*  New base middleware class provides utilities to traverse a model's ancestors looking for a particular condition to be met. ([4acbdfd1](https://github.com/cloudflare-extension/unconventional/commit/4acbdfd141172bb0daee27f276aee6e9145f4da3))
+*  "Private" and "System" flags in the prop decorator now support functions. ([427f00bb](https://github.com/cloudflare-extension/unconventional/commit/427f00bbd3cf4f5ad16783e46aefc793862d8976))
+
+##### Other Changes
+
+* //github.com/cloudflare-extension/unconventional ([2665970a](https://github.com/cloudflare-extension/unconventional/commit/2665970aeb772143d728d189b6e9e573583f8494))
+
 ### 1.12.0 (2024-12-10)
 
 ##### New Features
