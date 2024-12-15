@@ -40,10 +40,6 @@
       "warn",
       "never"
     ],
-    "implicit-arrow-linebreak": [
-      "warn",
-      "beside"
-    ],
     "no-lonely-if": "warn",
     "no-unneeded-ternary": "warn",
     "no-trailing-spaces": [

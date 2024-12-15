@@ -1,4 +1,5 @@
 export * from './abstractbase.controller';
+export * from './abstractbase.middleware';
 export * from './api-error';
 export * from './base.cache';
 export * from './base.model';
