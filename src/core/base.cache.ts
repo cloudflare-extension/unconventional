@@ -1,10 +1,16 @@
 import { CachePrefix, DefaultCacheTTL } from "../types/api.types";
 import { isEmpty } from "../utils/array.utils";
+import { CloudflareKV, CloudflareKVAPI } from "../utils/cloudflare.utils";
 import { sha256 } from "../utils/crypto.utils";
 import { BaseModel } from "./base.model";
 
 export class BaseCache {
   private static kvKeySizeLimit = 512;
+  private static kvApi: CloudflareKV;
+
+  public static async setKVApi(config: CloudflareKVAPI) {
+    this.kvApi = new CloudflareKV(config);
+  }
 
   public static async get<T>(cache: KVNamespace, key: string): Promise<T | null> {
     if (key.length > this.kvKeySizeLimit) return null;
@@ -53,24 +59,25 @@ export class BaseCache {
     const identifier = model?.$id();
     if (!identifier) return;
 
-    // Delete by ID
+    // Get keys by ID
     const idList = await cache.list({ prefix: `${CachePrefix.Record}${model.constructor.name}:${identifier.toString()}` });
-    const idPromises = idList.keys.map(async key => {
-      await this.delete(cache, key.name);
-    });
+    const keysToDelete = idList.keys.map(key => key.name);
 
-    // Delete by Key
-    let keyPromises: Promise<void>[] = [];
+    // Get keys by Key
     if (model.$key()) {
       const keyList = await cache.list({ prefix: `${CachePrefix.Record}${model.constructor.name}:${model.$key()}` });
-
-      keyPromises = keyList.keys.map(async key => {
-        await this.delete(cache, key.name);
-      });
+      keysToDelete.push(...keyList.keys.map(key => key.name));
     }
-
-    // Execute
-    await Promise.all([...idPromises, ...keyPromises]);
+    
+    if (this.kvApi) {
+      // Use bulk delete if KV API is available
+      await this.kvApi.deleteKeys(keysToDelete);
+    } else {
+      // Fallback to parallel individual deletes
+      await Promise.all(
+        keysToDelete.map(key => this.delete(cache, key))
+      );
+    }
   }
   //#endregion
 
@@ -96,10 +103,17 @@ export class BaseCache {
   /** Deletes a page from the cache. Deletes all modified versions too. */
   public static async clearPage<T extends typeof BaseModel>(cache: KVNamespace, model: T): Promise<void> {
     const list = await cache.list({ prefix: `${CachePrefix.Page}${model.name}` });
+    const keys = list.keys.map(key => key.name);
 
-    Promise.all(list.keys.map(async key => {
-      await this.delete(cache, key.name);
-    }));
+    if (this.kvApi) {
+      // Use bulk delete if KV API is available
+      await this.kvApi.deleteKeys(keys);
+    } else {
+      // Fallback to parallel individual deletes
+      await Promise.all(
+        keys.map(key => this.delete(cache, key))
+      );
+    }
   }
   //#endregion
 
