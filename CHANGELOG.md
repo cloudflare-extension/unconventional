@@ -1,3 +1,9 @@
+### 1.14.0 (2024-12-29)
+
+##### New Features
+
+*  Support bulk deletes in BaseCache using the KV API in favor of bindings ([326fccae](https://github.com/cloudflare-extension/unconventional/commit/326fccae32eb1680ae1138ee2373a19b31af31df))
+
 #### 1.13.2 (2024-12-15)
 
 ##### Bug Fixes
