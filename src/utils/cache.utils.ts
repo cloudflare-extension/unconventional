@@ -14,7 +14,11 @@ export async function getCachedOrFetch<T>(cache: KVNamespace, key: string, fetch
 
   // Cache if successful
   if (response && cache) {
-    await cache.put(key, JSON.stringify(response), { expirationTtl: ttl });
+    try {
+      await cache.put(key, JSON.stringify(response), { expirationTtl: ttl });
+    } catch (error) {
+      // Suppress cache errors (e.g. rate limiting) so response is still returned
+    }
   }
 
   return response;
