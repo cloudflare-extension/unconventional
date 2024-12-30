@@ -1,3 +1,9 @@
+#### 1.14.1 (2024-12-30)
+
+##### Bug Fixes
+
+*  Suppress rate limiting errors thrown by the getCachedOrFetch() method when many calls are made within 1 second to the cache. The cache should not preclude the fetched item from returning. This can happen, for example, when trying to get a user from the DB and cache it for subsequent calls. If too many calls come in at once, the first may not have time to cache its result before the next call comes in. Cloudflare KV will throw a 429 as it sees multiple writes to the same key within 1s. ([5e4b1aa7](https://github.com/cloudflare-extension/unconventional/commit/5e4b1aa726d1e91f2a6eead00313401498f6ab55))
+
 ### 1.14.0 (2024-12-29)
 
 ##### New Features
