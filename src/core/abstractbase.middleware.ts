@@ -57,7 +57,7 @@ export class AbstractBaseMiddleware<M extends typeof BaseModel> {
       if (!belongsToRelation) return null;
 
       const [relationKey, prop] = belongsToRelation;
-      const parentModel = getRelationModel(prop.relation!.model);
+      const parentModel = getRelationModel(prop.relation!);
       
       path.push(relationKey);
       currentModel = parentModel;
