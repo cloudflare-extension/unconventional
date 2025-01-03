@@ -1,3 +1,9 @@
+#### 1.14.2 (2025-01-03)
+
+##### Bug Fixes
+
+*  Fix error in base middleware in which the wrong param is passed to getRelationModel ([2563e0cc](https://github.com/cloudflare-extension/unconventional/commit/2563e0cc9add551937f58b2a6e9e201b92e01467))
+
 #### 1.14.1 (2024-12-30)
 
 ##### Bug Fixes
