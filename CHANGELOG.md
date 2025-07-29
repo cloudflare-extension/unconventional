@@ -1,3 +1,13 @@
+### 1.15.0 (2025-07-29)
+
+##### Chores
+
+*  update package.lock ([d1edd427](https://github.com/cloudflare-extension/unconventional/commit/d1edd4275cda6da341af2c55ae1d92e064102249))
+
+##### New Features
+
+*  Add support for filtering on relations ([a936439a](https://github.com/cloudflare-extension/unconventional/commit/a936439a348ea76532bb09ec2af0a991a7e8c7ec))
+
 #### 1.14.2 (2025-01-03)
 
 ##### Bug Fixes

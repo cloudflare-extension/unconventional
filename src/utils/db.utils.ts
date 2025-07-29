@@ -71,6 +71,8 @@ export function getWhere<T extends typeof BaseModel>(model: T, filterString?: st
       let field = filter.substring(0, filter.indexOf(operator)).trim();
       let value: string | null = filter.substring(filter.indexOf(operator) + operator.length).trim();
       let jsonPath: string[] = [];
+      let relationPath: string | undefined = undefined;
+
 
       // Handle IS NULL and IS NOT NULL, which don't have values
       if (operator.startsWith('IS')) {
@@ -80,13 +82,28 @@ export function getWhere<T extends typeof BaseModel>(model: T, filterString?: st
       // Handle JSON path
       if (field.includes('.')) {
         jsonPath = field.split('.');
-        field = jsonPath.shift() as string;
+        const target = jsonPath.shift() as string;
+
+        // Split relational fields into relation and field. e.g. 'user.name' -> 'user' and 'name'
+        // Otherwise, assume json
+        const relation = propSummary[target]?.relation;
+        if (relation) {
+          if (jsonPath.length !== 1) throw APIError.errInvalidQueryParameter(`Invalid filter: '${field}'. Relation filters must be in the format: 'relation.field'`);
+
+          const relationModel = getRelationModel(relation);
+          if (!relationModel.schema.props[jsonPath[0]]) throw APIError.errInvalidQueryParameter(`Invalid filter: '${field}'.`);
+
+          relationPath = target;
+          field = jsonPath.shift() as string;
+        } else {
+          field = target;
+        }
       }
 
-      if (!propSummary[field]) throw APIError.errInvalidQueryParameter(`Invalid filter: '${field}'`);
+      if (!relationPath && !propSummary[field]) throw APIError.errInvalidQueryParameter(`Invalid filter: '${field}'`);
       if (!value && !NullSqlOperators.includes(operator)) throw APIError.errInvalidQueryParameter(`Invalid value in filter: '${value}'`);
 
-      wheres.push({ field, jsonPath, operator: operator as SqlWhereOperator, value, andOr });
+      wheres.push({ field, jsonPath, relationPath, operator: operator as SqlWhereOperator, value, andOr });
     });
   }
 
@@ -163,4 +180,12 @@ export function buildFilter<T>(field: keyof T, operator: SqlWhereOperator, value
     formatted = '';
 
   return `${field as string} ${operator} ${formatted}`;
+}
+
+/** Creates expansions for relational filters */
+export function expandRelationalFilters<T extends typeof BaseModel>(model: T, wheres: SqlWhere[], expand: Record<string, Expansion>): Record<string, Expansion> {
+  const missingExpansions = wheres.flatMap(where => (where.relationPath && !expand[where.relationPath]) ? [where.relationPath] : []);
+
+  const addedExpansions = getExpand(model, missingExpansions.join(','));
+  return { ...expand, ...addedExpansions };
 }
