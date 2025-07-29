@@ -45,7 +45,7 @@
   },
   "peerDependencies": {
     "hono": "^4",
-    "unconventional-pg-queries": "^1.1.0"
+    "unconventional-pg-queries": "^1.4.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20231121.0",
@@ -53,6 +53,6 @@
     "@typescript-eslint/parser": "^5.62.0",
     "hono": "^4",
     "typescript": "^5.3.3",
-    "unconventional-pg-queries": "^1.0.0"
+    "unconventional-pg-queries": "^1.4.0"
   }
 }

@@ -4,7 +4,7 @@ import { timestamp } from "../decorators/timestamp.decorator";
 import { DB, SqlAction } from "../types/db.types";
 import { IndexSummary, PropSummary } from "../types/decorator.types";
 import { FilterConfig, PageConfig, UpsertConfig } from "./base.options";
-import { getConflict, getExpand, getOrder, getPage, getWhere } from "../utils/db.utils";
+import { expandRelationalFilters, getConflict, getExpand, getOrder, getPage, getWhere } from "../utils/db.utils";
 import { evaluate, getRelationModel, isUUID } from "../utils";
 
 interface BaseModelSchema {
@@ -82,24 +82,30 @@ export class BaseModel extends Document {
   }
 
   public static async findOne<T extends typeof BaseModel>(this: T, config: FilterConfig): Promise<InstanceType<T> | null> {
+    const where = getWhere(this, config?.filter);
+    const expand = expandRelationalFilters(this, where, getExpand(this, config?.expand));
+
     const response = await this.db.fetch<T>({
       action: SqlAction.Select,
       type: OneOrMany.One,
       table: this.collection,
-      expand: getExpand(this, config?.expand),
-      where: getWhere(this, config?.filter)
+      expand,
+      where
     });
 
     return response ? this.fromDatabaseJson(response) : null;
   }
 
   public static async findMany<T extends typeof BaseModel>(this: T, config?: PageConfig & FilterConfig): Promise<Array<InstanceType<T>>> {
+    const where = getWhere(this, config?.filter);
+    const expand = expandRelationalFilters(this, where, getExpand(this, config?.expand));
+
     const response = await this.db.fetch<T[]>({
       action: SqlAction.Select,
       type: OneOrMany.Many,
       table: this.collection,
-      expand: getExpand(this, config?.expand),
-      where: getWhere(this, config?.filter),
+      expand,
+      where,
       order: getOrder(this, config?.sort),
       page: getPage(this, config?.cursor),
       limit: config?.limit
@@ -162,11 +168,15 @@ export class BaseModel extends Document {
   }
 
   public static async deleteMany<T extends typeof BaseModel>(this: T, config?: FilterConfig): Promise<InstanceType<T>[] | null> {
+    const where = getWhere(this, config?.filter);
+    const expand = expandRelationalFilters(this, where, getExpand(this, config?.expand));
+
     const response = await this.db.fetch<T[]>({
       action: SqlAction.Delete,
       type: OneOrMany.Many,
       table: this.collection,
-      where: getWhere(this, config?.filter)
+      expand,
+      where
     });
 
     if (!response) return null;
