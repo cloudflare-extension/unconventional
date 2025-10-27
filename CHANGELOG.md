@@ -1,3 +1,9 @@
+### 1.16.0 (2025-10-27)
+
+##### New Features
+
+*  support similarity operator ([63ef6868](https://github.com/cloudflare-extension/unconventional/commit/63ef68689ccf86edd97d9fdbf7253d2cac9f1e02))
+
 ### 1.15.0 (2025-07-29)
 
 ##### Chores
