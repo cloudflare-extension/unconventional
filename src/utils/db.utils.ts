@@ -38,73 +38,156 @@ export function getExpand<T extends typeof BaseModel>(model: T, expand?: string)
   return expansions;
 }
 
+/** Parses a single filter condition into a SqlWhere object */
+function parseSingleFilter<T extends typeof BaseModel>(model: T, filter: string, andOr?: AndOr): SqlWhere {
+  const propSummary = model.schema.props;
+  
+  const singleQuoteIndex = filter.indexOf("'");
+  
+  const matchingOperators = singleQuoteIndex === -1 ?
+    ValidSqlOperators.filter(op => filter.includes(` ${op}`)) :
+    ValidSqlOperators.filter(op => filter.includes(` ${op}`) && filter.indexOf(` ${op}`) < singleQuoteIndex);
+  
+  if (!matchingOperators.length) throw APIError.errInvalidQueryParameter(`No valid operator in filter: '${filter}'`);
+  
+  // Handle when multiple operators are present in the filter (e.g. LIKE and NOT LIKE)
+  let operator = matchingOperators.sort((a, b) => b.length - a.length)[0];
+
+  let field = filter.substring(0, filter.indexOf(operator)).trim();
+  let value: string | null = filter.substring(filter.indexOf(operator) + operator.length).trim();
+  let jsonPath: string[] = [];
+  let relationPath: string | undefined = undefined;
+
+  // Handle IS NULL and IS NOT NULL, which don't have values
+  if (operator.startsWith('IS')) {
+    value = null;
+  }
+
+  // Handle JSON path
+  if (field.includes('.')) {
+    jsonPath = field.split('.');
+    const target = jsonPath.shift() as string;
+
+    // Split relational fields into relation and field. e.g. 'user.name' -> 'user' and 'name'
+    // Otherwise, assume json
+    const relation = propSummary[target]?.relation;
+    if (relation) {
+      if (jsonPath.length !== 1) throw APIError.errInvalidQueryParameter(`Invalid filter: '${field}'. Relation filters must be in the format: 'relation.field'`);
+
+      const relationModel = getRelationModel(relation);
+      if (!relationModel.schema.props[jsonPath[0]]) throw APIError.errInvalidQueryParameter(`Invalid filter: '${field}'.`);
+
+      relationPath = target;
+      field = jsonPath.shift() as string;
+    } else {
+      field = target;
+    }
+  }
+
+  if (!relationPath && !propSummary[field]) throw APIError.errInvalidQueryParameter(`Invalid filter: '${field}'`);
+  if (!value && !NullSqlOperators.includes(operator)) throw APIError.errInvalidQueryParameter(`Invalid value in filter: '${value}'`);
+
+  return { field, jsonPath, relationPath, operator: operator as SqlWhereOperator, value, andOr };
+}
+
+/** Extracts content within parentheses and returns it along with the position after the closing paren */
+function extractParenthesesContent(str: string, startIndex: number): { content: string, endIndex: number } {
+  let depth = 1;
+  let i = startIndex + 1;
+  
+  while (i < str.length && depth > 0) {
+    if (str[i] === '(') depth++;
+    else if (str[i] === ')') depth--;
+    i++;
+  }
+  
+  if (depth !== 0) throw APIError.errInvalidQueryParameter(`Unmatched parentheses in filter`);
+  
+  return {
+    content: str.substring(startIndex + 1, i - 1),
+    endIndex: i
+  };
+}
+
+/** Checks if a parenthesis is part of an operator value (e.g., IN (...)) or a compound clause */
+function isOperatorValueParen(str: string, parenIndex: number): boolean {
+  // Look backwards to see if there's an operator that uses parentheses for values
+  const beforeParen = str.substring(0, parenIndex).trimEnd();
+  
+  // Check for operators that use parentheses: IN, NOT IN
+  return beforeParen.endsWith(' IN') || beforeParen.endsWith(' NOT IN');
+}
+
 /** Converts a string of filters to an array of 'where' clause outlines for a SQL environment */
 export function getWhere<T extends typeof BaseModel>(model: T, filterString?: string): SqlWhere[] {
   if (!filterString) return [];
 
-  const propSummary = model.schema.props;
   const wheres: SqlWhere[] = [];
+  let i = 0;
+  let currentFilter = '';
+  let currentAndOr: AndOr | undefined = undefined;
 
-  if (filterString) {
-    filterString.split(andOrPattern).forEach((filter) => {
-      // Handle logically combined clauses
-      let andOr: AndOr | undefined = undefined;
-      if (filter.startsWith(AndOr.And)) {
-        filter = filter.substring(AndOr.And.length + 1);
-        andOr = AndOr.And;
-      } else if (filter.startsWith(AndOr.Or)) {
-        filter = filter.substring(AndOr.Or.length + 1);
-        andOr = AndOr.Or;
+  while (i < filterString.length) {
+    const char = filterString[i];
+    
+    // Check for closing parenthesis without matching opening (error case)
+    if (char === ')' && !currentFilter.includes('(')) {
+      throw APIError.errInvalidQueryParameter('Unmatched closing parenthesis in filter');
+    }
+    
+    // Check for opening parenthesis (but distinguish compound clauses from operator values)
+    if (char === '(' && !isOperatorValueParen(filterString, i)) {
+      const { content, endIndex } = extractParenthesesContent(filterString, i);
+      
+      // Recursively parse the compound clause
+      const nestedClauses = getWhere(model, content);
+      
+      if (nestedClauses.length > 0) {
+        // Create a wrapper clause using the first nested clause's properties
+        // and add the rest as sub-clauses
+        const [firstClause, ...restClauses] = nestedClauses;
+        const compoundClause: SqlWhere = {
+          ...firstClause,
+          andOr: currentAndOr,
+          clauses: restClauses.length > 0 ? restClauses : undefined
+        };
+        wheres.push(compoundClause);
       }
-
-      const singleQuoteIndex = filter.indexOf("'");
       
-      const matchingOperators = singleQuoteIndex === -1 ?
-        ValidSqlOperators.filter(op => filter.includes(` ${op}`)) :
-        ValidSqlOperators.filter(op => filter.includes(` ${op}`) && filter.indexOf(` ${op}`) < singleQuoteIndex);
-      
-      if (!matchingOperators.length) throw APIError.errInvalidQueryParameter(`No valid operator in filter: '${filter}'`);
-      
-      // Handle when multiple operators are present in the filter (e.g. LIKE and NOT LIKE)
-      let operator = matchingOperators.sort((a, b) => b.length - a.length)[0];
-
-      let field = filter.substring(0, filter.indexOf(operator)).trim();
-      let value: string | null = filter.substring(filter.indexOf(operator) + operator.length).trim();
-      let jsonPath: string[] = [];
-      let relationPath: string | undefined = undefined;
-
-
-      // Handle IS NULL and IS NOT NULL, which don't have values
-      if (operator.startsWith('IS')) {
-        value = null;
-      }
-
-      // Handle JSON path
-      if (field.includes('.')) {
-        jsonPath = field.split('.');
-        const target = jsonPath.shift() as string;
-
-        // Split relational fields into relation and field. e.g. 'user.name' -> 'user' and 'name'
-        // Otherwise, assume json
-        const relation = propSummary[target]?.relation;
-        if (relation) {
-          if (jsonPath.length !== 1) throw APIError.errInvalidQueryParameter(`Invalid filter: '${field}'. Relation filters must be in the format: 'relation.field'`);
-
-          const relationModel = getRelationModel(relation);
-          if (!relationModel.schema.props[jsonPath[0]]) throw APIError.errInvalidQueryParameter(`Invalid filter: '${field}'.`);
-
-          relationPath = target;
-          field = jsonPath.shift() as string;
-        } else {
-          field = target;
+      i = endIndex;
+      currentFilter = '';
+      currentAndOr = undefined;
+      continue;
+    }
+    
+    // Check for AND/OR keywords
+    if (i === 0 || filterString[i - 1] === ' ' || filterString[i - 1] === ')') {
+      if (filterString.substring(i, i + 4) === 'AND ') {
+        if (currentFilter.trim()) {
+          wheres.push(parseSingleFilter(model, currentFilter.trim(), currentAndOr));
+          currentFilter = '';
         }
+        currentAndOr = AndOr.And;
+        i += 4;
+        continue;
+      } else if (filterString.substring(i, i + 3) === 'OR ') {
+        if (currentFilter.trim()) {
+          wheres.push(parseSingleFilter(model, currentFilter.trim(), currentAndOr));
+          currentFilter = '';
+        }
+        currentAndOr = AndOr.Or;
+        i += 3;
+        continue;
       }
-
-      if (!relationPath && !propSummary[field]) throw APIError.errInvalidQueryParameter(`Invalid filter: '${field}'`);
-      if (!value && !NullSqlOperators.includes(operator)) throw APIError.errInvalidQueryParameter(`Invalid value in filter: '${value}'`);
-
-      wheres.push({ field, jsonPath, relationPath, operator: operator as SqlWhereOperator, value, andOr });
-    });
+    }
+    
+    currentFilter += char;
+    i++;
+  }
+  
+  // Process any remaining filter
+  if (currentFilter.trim()) {
+    wheres.push(parseSingleFilter(model, currentFilter.trim(), currentAndOr));
   }
 
   return wheres;
