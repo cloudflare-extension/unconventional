@@ -1,3 +1,9 @@
+### 1.17.0 (2025-10-29)
+
+##### New Features
+
+*  Add compound clause support to the getWhere method ([97edbbf2](https://github.com/cloudflare-extension/unconventional/commit/97edbbf2cc3b25623eb999a0d1dd486417c678a1))
+
 ### 1.16.0 (2025-10-27)
 
 ##### New Features
