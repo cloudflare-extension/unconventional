@@ -21,5 +21,8 @@
     "types": [
       "@cloudflare/workers-types"
     ]
-  }
+  },
+  "exclude": [
+    "src/tests/**/*.test.ts"
+  ]
 }

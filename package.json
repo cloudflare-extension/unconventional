@@ -33,6 +33,7 @@
     "clean": "tsc --build --clean",
     "build": "rm -rf dist && tsc --build",
     "watch": "tsc --watch",
+    "test": "for file in src/tests/*.test.ts; do tsx \"$file\" || exit 1; done",
     "lint": "eslint . --ext js,jsx,ts,tsx",
     "format": "eslint . --ext js,jsx,ts,tsx --fix",
     "docs:dev": "vitepress dev docs",
@@ -45,14 +46,15 @@
   },
   "peerDependencies": {
     "hono": "^4",
-    "unconventional-pg-queries": "^1.5.0"
+    "unconventional-pg-queries": "^1.6.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20231121.0",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
     "hono": "^4",
+    "tsx": "^4.20.6",
     "typescript": "^5.3.3",
-    "unconventional-pg-queries": "^1.5.0"
+    "unconventional-pg-queries": "^1.6.0"
   }
 }
