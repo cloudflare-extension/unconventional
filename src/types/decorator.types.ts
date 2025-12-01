@@ -93,6 +93,8 @@ export interface PropOptions<T = any, S extends typeof BaseModel = any, P extend
   ) => boolean);
   /** Relational field data */
   relation?: T extends typeof BaseModel ? Relation<T, S, P> : never;
+  /** Format the field value before it is stored in the database */
+  preFormat?: (fieldValue: T extends typeof BaseModel ? InstanceType<T> : T) => any;
 }
 
 /** Type for the Values stored in the Reflection for Properties */

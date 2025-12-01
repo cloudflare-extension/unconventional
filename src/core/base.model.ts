@@ -41,7 +41,7 @@ export class BaseModel extends Document {
       type: OneOrMany.One,
       table: this.collection,
       conflict: getConflict(this, upsertConfig?.action || ConflictResolution.doUpdate, upsertConfig?.constraint),
-      data: this.addDefaults({ ...data, ...timestamp })
+      data: this.prepareData({ ...data, ...timestamp })
     });
 
     if (!response) return null;
@@ -61,7 +61,7 @@ export class BaseModel extends Document {
       type: OneOrMany.Many,
       table: this.collection,
       conflict: getConflict(this, upsertConfig?.action || ConflictResolution.doUpdate, upsertConfig?.constraint),
-      data: data.map(item => this.addDefaults({ ...item, ...timestamp }))
+      data: data.map(item => this.prepareData({ ...item, ...timestamp }))
     });
 
     if (!response) return null;
@@ -126,7 +126,7 @@ export class BaseModel extends Document {
       type: OneOrMany.One,
       table: this.collection,
       where: [{ field: targetField, operator: SqlWhereOperator.Eq, value: id }],
-      data: { ...data, ...timestamp }
+      data: this.prepareData({ ...data, ...timestamp }, false)
     });
 
     if (!response) return null;
@@ -142,7 +142,7 @@ export class BaseModel extends Document {
       action: SqlAction.Update,
       type: OneOrMany.Many,
       table: this.collection,
-      data: data.map(item => ({ ...item, ...timestamp }))
+      data: data.map(item => this.prepareData({ ...item, ...timestamp }, false))
     });
 
     if (!response) return null;
@@ -230,11 +230,17 @@ export class BaseModel extends Document {
     return model as InstanceType<T>;
   }
 
-  private static addDefaults<T extends typeof BaseModel>(this: T, data: Partial<InstanceType<T>>) {
+  private static prepareData<T extends typeof BaseModel>(this: T, data: Partial<InstanceType<T>>, applyDefaults: boolean = true) {
     Object.entries(this.schema.props).forEach(([key, options]) => {
-      if (data[key] === undefined && options.default != null) {
+      // Apply default
+      if (applyDefaults && data[key] === undefined && options.default != null) {
         const val = options.default;
         data[key] = typeof val === "function" ? val() : val;
+      }
+
+      // Apply preFormat
+      if (data[key] !== undefined && options.preFormat != null) {
+        data[key] = options.preFormat(data[key]);
       }
     });
 
