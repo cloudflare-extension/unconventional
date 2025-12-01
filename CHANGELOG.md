@@ -1,3 +1,9 @@
+### 1.18.0 (2025-12-01)
+
+##### New Features
+
+*  Add preformatting as an property option on BaseModel. Useful for formatting JSONB arrays as strings, e.g., so they don't get interpreted by pg as postgres arrays ([f89734fa](https://github.com/cloudflare-extension/unconventional/commit/f89734fa013ac040e9521283b2e45accce68e388))
+
 ### 1.17.0 (2025-10-29)
 
 ##### New Features
