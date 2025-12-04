@@ -16,6 +16,11 @@ interface BaseModelSchema {
   };
 }
 
+export enum IdType {
+  Number = 'number',
+  UUID = 'uuid'
+}
+
 export class Document {
   public static schema: BaseModelSchema = { indexes: [], props: {} };
 }
@@ -23,6 +28,7 @@ export class Document {
 export class BaseModel extends Document {
   public static collection: string;
   public static idField: string = 'id';
+  public static idType: IdType = IdType.Number;
   public static keyField?: string;
   public static ownerField?: string;
   public static db: DB;
@@ -249,7 +255,7 @@ export class BaseModel extends Document {
 
   /** Gets the field name to use for the provided identifier */
   private static getFieldName<T extends typeof BaseModel>(this: T, identifier: string | number) {
-    return !isNaN(+identifier) || isUUID(`${identifier}`)
+    return (this.idType === IdType.Number && !isNaN(+identifier)) || (this.idType === IdType.UUID && isUUID(`${identifier}`))
       ? this.idField
       : this.keyField || undefined;
   }

@@ -1,7 +1,7 @@
 import { SqlWhereOperator } from "unconventional-pg-queries";
 import { APIError } from "./api-error";
 import { BaseCache } from "./base.cache";
-import { BaseModel } from "./base.model";
+import { BaseModel, IdType } from "./base.model";
 import { FilterConfig, PageConfig, ServiceConfig } from "./base.options";
 import { buildFilter } from "../utils/db.utils";
 import { isUUID } from "../utils";
@@ -71,7 +71,7 @@ export class BaseService<M extends typeof BaseModel> {
     }
 
     if (!entity) {
-      if (!isNaN(+identifier) || isUUID(`${identifier}`)) {
+      if ((this.model.idType === IdType.Number && !isNaN(+identifier)) || (this.model.idType === IdType.UUID && isUUID(`${identifier}`))) {
         entity = await this.model.findById(identifier, modifiers);
       } else {
         const keyFilter = buildFilter<M>(this.model.keyField as keyof M, SqlWhereOperator.Eq, identifier);
