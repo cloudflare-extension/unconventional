@@ -1,3 +1,9 @@
+## 2.0.0 (2025-12-04)
+
+##### Breaking Changes
+
+*  BaseService will no longer assume UUIDs are id columns. 1idType = IdType.UUID` must be set on the model for this behavior. ([db9c7362](https://github.com/cloudflare-extension/unconventional/commit/db9c73626f923f40f0d1d75d89c2b492e9c2a7f4))
+
 ### 1.18.0 (2025-12-01)
 
 ##### New Features
