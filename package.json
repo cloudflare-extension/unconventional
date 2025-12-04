@@ -1,6 +1,6 @@
 {
   "name": "unconventional",
-  "version": "1.18.0",
+  "version": "2.0.0",
   "description": "A complete server built on Cloudflare Workers/Pages",
   "keywords": [
     "cloudflare",
