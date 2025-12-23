@@ -318,7 +318,7 @@ export abstract class AbstractBaseController<M extends typeof BaseModel, E exten
 
     return {
       headers: ctx.req.raw.headers,
-      waitUntil: ctx.executionCtx.waitUntil,
+      waitUntil: ctx.executionCtx?.waitUntil.bind(ctx.executionCtx),
       body: body,
       params: ctx.req.param(),
       queries: ctx.req.query(),
