@@ -1,3 +1,10 @@
+#### 2.0.1 (2025-12-23)
+
+##### Bug Fixes
+
+*  Fix "Illegal invocation" error when using `context.waitUntil` in ResponseProcessor hooks by properly binding the method to its execution context. ([72c3452](https://github.com/cloudflare-extension/unconventional/commit/72c3452bd1415d69d3316f99e282c47b6db8a068))
+
+
 ## 2.0.0 (2025-12-04)
 
 ##### Breaking Changes
