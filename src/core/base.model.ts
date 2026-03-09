@@ -190,11 +190,16 @@ export class BaseModel extends Document {
     return response.map(item => this.fromDatabaseJson(item));
   }
 
-  public static async count<T extends typeof BaseModel>(this: T): Promise<number | null> {
+  public static async count<T extends typeof BaseModel>(this: T, config?: FilterConfig): Promise<number | null> {
+    const where = getWhere(this, config?.filter);
+    const expand = expandRelationalFilters(this, where, getExpand(this, config?.expand));
+
     const response = await this.db.fetch<{ count: number }>({
       action: SqlAction.Select,
       type: OneOrMany.Many,
       table: this.collection,
+      expand,
+      where,
       subAction: SubAction.Count
     });
 
