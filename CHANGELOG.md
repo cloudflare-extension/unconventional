@@ -1,3 +1,9 @@
+### 2.1.0 (2026-03-09)
+
+##### New Features
+
+*  support filters and relations on BaseModel.count ([2f77511c](https://github.com/cloudflare-extension/unconventional/commit/2f77511c1af8748ef0aa4feb4dc3854b8646906f))
+
 #### 2.0.1 (2025-12-23)
 
 ##### Bug Fixes
