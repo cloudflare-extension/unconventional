@@ -1,5 +1,15 @@
 ### 2.1.0 (2026-03-09)
 
+##### Chores
+
+*  update version of query lib ([4a93d079](https://github.com/cloudflare-extension/unconventional/commit/4a93d079e72ad3c8c9ad4fe6d2650adcc9a31066))
+
+##### New Features
+
+*  support filters and relations on BaseModel.count ([2f77511c](https://github.com/cloudflare-extension/unconventional/commit/2f77511c1af8748ef0aa4feb4dc3854b8646906f))
+
+### 2.1.0 (2026-03-09)
+
 ##### New Features
 
 *  support filters and relations on BaseModel.count ([2f77511c](https://github.com/cloudflare-extension/unconventional/commit/2f77511c1af8748ef0aa4feb4dc3854b8646906f))
