@@ -21,6 +21,7 @@ interface DownloadResponse {
 export interface UpsertConfig<M extends typeof BaseModel> {
   constraint?: Array<keyof InstanceType<M>>;
   action?: ConflictResolution;
+  where?: string;
 }
 
 export interface ServiceConfig<M extends typeof BaseModel> {

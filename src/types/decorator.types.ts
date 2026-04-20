@@ -14,6 +14,7 @@ export type IndexDefinition<T> = {
 /** Options to pass to MongoDB when creating an Index */
 export interface IndexOptions {
   unique?: boolean;
+  where?: string;
 }
 
 /**

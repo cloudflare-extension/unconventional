@@ -46,7 +46,7 @@ export class BaseModel extends Document {
       action: SqlAction.Insert,
       type: OneOrMany.One,
       table: this.collection,
-      conflict: getConflict(this, upsertConfig?.action || ConflictResolution.doUpdate, upsertConfig?.constraint),
+      conflict: getConflict(this, upsertConfig?.action || ConflictResolution.doUpdate, upsertConfig?.constraint, upsertConfig?.where),
       data: this.prepareData({ ...data, ...timestamp })
     });
 
@@ -66,7 +66,7 @@ export class BaseModel extends Document {
       action: SqlAction.Insert,
       type: OneOrMany.Many,
       table: this.collection,
-      conflict: getConflict(this, upsertConfig?.action || ConflictResolution.doUpdate, upsertConfig?.constraint),
+      conflict: getConflict(this, upsertConfig?.action || ConflictResolution.doUpdate, upsertConfig?.constraint, upsertConfig?.where),
       data: data.map(item => this.prepareData({ ...item, ...timestamp }))
     });
 

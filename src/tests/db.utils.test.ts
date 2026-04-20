@@ -1,6 +1,6 @@
-import { getWhere } from '../utils/db.utils';
+import { getConflict, getWhere } from '../utils/db.utils';
 import { BaseModel } from '../core/base.model';
-import { AndOr, SqlWhereOperator } from 'unconventional-pg-queries';
+import { AndOr, ConflictResolution, SqlWhereOperator } from 'unconventional-pg-queries';
 
 // Create a mock test model
 class TestModel extends BaseModel {
@@ -23,6 +23,27 @@ class TestModel extends BaseModel {
   city!: string;
   email!: string;
   status!: string;
+}
+
+class ConflictTestModel extends BaseModel {
+  static override collection = 'conflict_collection';
+  static override idField = 'id';
+  static override schema = {
+    indexes: [
+      {
+        definition: { external_id: 1, account_id: 1 },
+        options: { unique: true, where: "external_id IS NOT NULL AND external_id <> ''" }
+      }
+    ],
+    props: {
+      id: { relation: undefined },
+      external_id: { relation: undefined },
+      account_id: { relation: undefined }
+    }
+  };
+
+  external_id!: string | null;
+  account_id!: number | null;
 }
 
 // Test utilities
@@ -77,6 +98,33 @@ test('handles empty filter string', () => {
 test('handles undefined filter string', () => {
   const result = getWhere(TestModel);
   assertEquals(result, []);
+});
+
+test('getConflict includes partial index predicate from model metadata', () => {
+  const result = getConflict(
+    ConflictTestModel,
+    ConflictResolution.doNothing,
+    ['external_id', 'account_id']
+  );
+  assertEquals(result, {
+    action: ConflictResolution.doNothing,
+    constraint: ['external_id', 'account_id'],
+    where: "external_id IS NOT NULL AND external_id <> ''"
+  });
+});
+
+test('getConflict prefers explicit predicate over model metadata', () => {
+  const result = getConflict(
+    ConflictTestModel,
+    ConflictResolution.doNothing,
+    ['external_id', 'account_id'],
+    "external_id <> ''"
+  );
+  assertEquals(result, {
+    action: ConflictResolution.doNothing,
+    constraint: ['external_id', 'account_id'],
+    where: "external_id <> ''"
+  });
 });
 
 test('parses simple equality filter', () => {

@@ -239,13 +239,15 @@ export function getReturn<T extends typeof BaseModel>(model: T): string[] {
   return fields;
 }
 
-export function getConflict<T extends typeof BaseModel>(model: T, action: ConflictResolution, constraint?: Array<keyof InstanceType<T>>): SqlConflict | undefined {
+export function getConflict<T extends typeof BaseModel>(model: T, action: ConflictResolution, constraint?: Array<keyof InstanceType<T>>, where?: string): SqlConflict | undefined {
   if (!constraint) return undefined;
   const indexes = model.schema.indexes;
 
   for (const index of indexes) {
     const keys = Object.keys(index.definition);
-    if (equalArrays(keys, constraint as string[])) return { action, constraint: keys };
+    if (equalArrays(keys, constraint as string[])) {
+      return { action, constraint: keys, where: where ?? index.options?.where };
+    }
   }
 
   return undefined;
