@@ -6,6 +6,40 @@
 
 ##### Chores
 
+*  Move generate-changelog dep from global to dev dep ([0648cfc8](https://github.com/cloudflare-extension/unconventional/commit/0648cfc8e3ee47a80b76b652b741487d593562cc))
+*  update version of query lib ([4a93d079](https://github.com/cloudflare-extension/unconventional/commit/4a93d079e72ad3c8c9ad4fe6d2650adcc9a31066))
+*  update package.lock ([d1edd427](https://github.com/cloudflare-extension/unconventional/commit/d1edd4275cda6da341af2c55ae1d92e064102249))
+
+##### New Features
+
+*  Support predicates in upsert constraints. Can be set in model index or upsert config ([b59089f8](https://github.com/cloudflare-extension/unconventional/commit/b59089f86fa5f783f32b52c4e73d89b0c29d78f0))
+*  support filters and relations on BaseModel.count ([2f77511c](https://github.com/cloudflare-extension/unconventional/commit/2f77511c1af8748ef0aa4feb4dc3854b8646906f))
+*  Add preformatting as an property option on BaseModel. Useful for formatting JSONB arrays as strings, e.g., so they don't get interpreted by pg as postgres arrays ([f89734fa](https://github.com/cloudflare-extension/unconventional/commit/f89734fa013ac040e9521283b2e45accce68e388))
+*  Add compound clause support to the getWhere method ([97edbbf2](https://github.com/cloudflare-extension/unconventional/commit/97edbbf2cc3b25623eb999a0d1dd486417c678a1))
+*  support similarity operator ([63ef6868](https://github.com/cloudflare-extension/unconventional/commit/63ef68689ccf86edd97d9fdbf7253d2cac9f1e02))
+*  Add support for filtering on relations ([a936439a](https://github.com/cloudflare-extension/unconventional/commit/a936439a348ea76532bb09ec2af0a991a7e8c7ec))
+*  Support bulk deletes in BaseCache using the KV API in favor of bindings ([326fccae](https://github.com/cloudflare-extension/unconventional/commit/326fccae32eb1680ae1138ee2373a19b31af31df))
+*  New base middleware class provides utilities to traverse a model's ancestors looking for a particular condition to be met. ([4acbdfd1](https://github.com/cloudflare-extension/unconventional/commit/4acbdfd141172bb0daee27f276aee6e9145f4da3))
+*  "Private" and "System" flags in the prop decorator now support functions. ([427f00bb](https://github.com/cloudflare-extension/unconventional/commit/427f00bbd3cf4f5ad16783e46aefc793862d8976))
+
+##### Bug Fixes
+
+*  Fix error in base middleware in which the wrong param is passed to getRelationModel ([2563e0cc](https://github.com/cloudflare-extension/unconventional/commit/2563e0cc9add551937f58b2a6e9e201b92e01467))
+*  Suppress rate limiting errors thrown by the getCachedOrFetch() method when many calls are made within 1 second to the cache. The cache should not preclude the fetched item from returning. This can happen, for example, when trying to get a user from the DB and cache it for subsequent calls. If too many calls come in at once, the first may not have time to cache its result before the next call comes in. Cloudflare KV will throw a 429 as it sees multiple writes to the same key within 1s. ([5e4b1aa7](https://github.com/cloudflare-extension/unconventional/commit/5e4b1aa726d1e91f2a6eead00313401498f6ab55))
+*  Fixed bug where privacy masking would throw an error if the field targeted was undefined ([c9d71505](https://github.com/cloudflare-extension/unconventional/commit/c9d715057a6894449720290591c8f714adecce53))
+
+##### Other Changes
+
+* //github.com/cloudflare-extension/unconventional ([2665970a](https://github.com/cloudflare-extension/unconventional/commit/2665970aeb772143d728d189b6e9e573583f8494))
+
+### 2.2.0 (2026-04-20)
+
+##### Breaking Changes
+
+*  BaseService will no longer assume UUIDs are id columns. 1idType = IdType.UUID` must be set on the model for this behavior. ([db9c7362](https://github.com/cloudflare-extension/unconventional/commit/db9c73626f923f40f0d1d75d89c2b492e9c2a7f4))
+
+##### Chores
+
 *  update version of query lib ([4a93d079](https://github.com/cloudflare-extension/unconventional/commit/4a93d079e72ad3c8c9ad4fe6d2650adcc9a31066))
 *  update package.lock ([d1edd427](https://github.com/cloudflare-extension/unconventional/commit/d1edd4275cda6da341af2c55ae1d92e064102249))
 
