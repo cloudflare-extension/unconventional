@@ -1,4 +1,4 @@
-import { getConflict, getWhere } from '../utils/db.utils';
+import { buildFilter, getConflict, getWhere } from '../utils/db.utils';
 import { BaseModel } from '../core/base.model';
 import { AndOr, ConflictResolution, SqlWhereOperator } from 'unconventional-pg-queries';
 
@@ -543,6 +543,17 @@ test('throws error for unmatched closing parentheses', () => {
   assertThrows(() => {
     getWhere(TestModel, "name = 'Greg')");
   });
+});
+
+test('buildFilter escapes apostrophes in scalar and list values', () => {
+  assertEquals(
+    buildFilter<TestModel>('name', SqlWhereOperator.Eq, "O'Brien"),
+    "name = 'O''Brien'"
+  );
+  assertEquals(
+    buildFilter<TestModel>('name', SqlWhereOperator.In, ["O'Brien", 'Alice']),
+    "name IN ('O''Brien','Alice')"
+  );
 });
 
 // Print summary

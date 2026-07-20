@@ -255,14 +255,16 @@ export function getConflict<T extends typeof BaseModel>(model: T, action: Confli
 
 /** A type-safe way to build filter strings */
 export function buildFilter<T>(field: keyof T, operator: SqlWhereOperator, value?: any) {
+  const quote = (item: string) => `'${item.replace(/'/g, "''")}'`;
   let formatted = `${value}`;
 
-  if (typeof value === 'string')
-    formatted = `'${value}'`;
-  else if (Array.isArray(value))
-    formatted = (typeof value[0] === 'string') ? `('${value.join("','")}')` : `(${value.join()})`;
-  else if (value == null || NullSqlOperators.includes(operator))
+  if (value == null || NullSqlOperators.includes(operator)) {
     formatted = '';
+  } else if (typeof value === 'string') {
+    formatted = quote(value);
+  } else if (Array.isArray(value)) {
+    formatted = `(${value.map(item => typeof item === 'string' ? quote(item) : `${item}`).join(',')})`;
+  }
 
   return `${field as string} ${operator} ${formatted}`;
 }
