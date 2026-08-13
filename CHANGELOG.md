@@ -1,3 +1,9 @@
+### 2.4.0 (2026-08-13)
+
+##### New Features
+
+*  add updateWhere method to BaseModel and BaseService, supporting broader update queries defined by a filter rather than IDs ([f001f228](https://github.com/cloudflare-extension/unconventional/commit/f001f2289f282461d26c0fcf62ecc8a0a13be1e2))
+
 ### 2.3.0 (2026-07-20)
 
 ### 2.2.0 (2026-04-20)
