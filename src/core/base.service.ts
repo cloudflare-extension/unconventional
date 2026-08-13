@@ -160,6 +160,25 @@ export class BaseService<M extends typeof BaseModel> {
     return response;
   }
 
+  /** Applies one patch to every document matching a required filter. */
+  public async updateWhere(data: Partial<InstanceType<M>>, config: FilterConfig & { filter: string } & ServiceConfig<M>): Promise<InstanceType<M>[]> {
+    if (!config?.filter) throw APIError.errBadRequest("No filter provided");
+
+    const response = await this.model.updateWhere(data, { filter: config.filter, expand: config.expand });
+
+    if (!response) {
+      throw APIError.errResourceUpdateFailed(`Failed to update ${this.model.name}s`);
+    } else if (config.cache) {
+      const cache = config.cache;
+
+      await BaseCache.clearPage(cache, this.model);
+      await Promise.all(response.map(item => BaseCache.clearModel(cache, item)));
+      await Promise.all(response.map(item => BaseCache.setModel(cache, item, undefined, config.cacheTTL)));
+    }
+
+    return response;
+  }
+
   /**
    * Deletes the document with the given identifier.
    * @param identifier - The id or key of a document. If type is number, lookup will be done with the model's idColumn. Otherwise, keyColumn is used.

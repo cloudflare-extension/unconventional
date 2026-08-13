@@ -156,6 +156,29 @@ export class BaseModel extends Document {
     return response.map(item => this.fromDatabaseJson(item));
   }
 
+  /** Applies one patch to every record matching a required filter. */
+  public static async updateWhere<T extends typeof BaseModel>(this: T, data: Partial<InstanceType<T>>, config: FilterConfig & { filter: string }): Promise<InstanceType<T>[] | null> {
+    if (!config?.filter) throw new Error("No filter provided");
+
+    const timestamp = this.schema.timestamp ? { [this.schema.timestamp.updatedField]: new Date() } : {};
+    const where = getWhere(this, config.filter);
+    const expand = expandRelationalFilters(this, where, getExpand(this, config.expand));
+    
+    const response = await this.db.fetch<T | T[]>({
+      action: SqlAction.Update,
+      type: OneOrMany.Many,
+      table: this.collection,
+      expand,
+      where,
+      data: this.prepareData({ ...data, ...timestamp }, false)
+    });
+
+    if (!response) return null;
+
+    const results = Array.isArray(response) ? response : [response];
+    return results.map(item => this.fromDatabaseJson(item));
+  }
+
   public static async delete<T extends typeof BaseModel>(this: T, id: string | number): Promise<InstanceType<T> | null> {
     const targetField = this.getFieldName(id);
     if (!targetField) return null;
