@@ -200,12 +200,22 @@ export function getOrder<T extends typeof BaseModel>(model: T, sort?: string): S
   const propSummary = model.schema.props;
   const orders: SqlOrder[] = [];
 
-  sort.split(',').forEach((item) => {
-    let [field, direction] = item.split(' ');
-    let jsonPath: string[] = [];
+  sort.split(/,(?![^()]*\))/).forEach((item) => {
+    let [field, direction] = item.trim().split(/\s+(?![^()]*\))/);
     direction ||= SqlDirection.Asc;
 
+    const coalesce = field.match(/^COALESCE\(([^()]+)\)$/i)?.[1].split(',').map(column => column.trim());
+    if (coalesce) {
+      field = coalesce.shift() ?? '';
+      if (!coalesce.length) throw APIError.errInvalidQueryParameter(`COALESCE requires a fallback field`);
+
+      coalesce.forEach(column => {
+        if (!propSummary[column]) throw APIError.errInvalidQueryParameter(`Invalid orderBy field: '${column}'`);
+      });
+    }
+    
     // Handle JSON path
+    let jsonPath: string[] = [];
     if (field.includes('.')) {
       jsonPath = field.split('.');
       field = jsonPath.shift() as string;
@@ -214,7 +224,7 @@ export function getOrder<T extends typeof BaseModel>(model: T, sort?: string): S
     if (!propSummary[field]) throw APIError.errInvalidQueryParameter(`Invalid orderBy field: '${field}'`);
     if (!ValidSortDirections.includes(direction.toUpperCase())) throw APIError.errInvalidQueryParameter(`Invalid orderBy direction: '${direction}'`);
 
-    orders.push({ field, jsonPath, direction: direction.toUpperCase() as SqlDirection });
+    orders.push({ field, jsonPath, direction: direction.toUpperCase() as SqlDirection, ...(coalesce ? { coalesce } : {}) });
   });
 
   return orders;

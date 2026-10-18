@@ -1,4 +1,4 @@
-import { buildFilter, getConflict, getWhere } from '../utils/db.utils';
+import { buildFilter, getConflict, getWhere, getOrder } from '../utils/db.utils';
 import { BaseModel } from '../core/base.model';
 import { AndOr, ConflictResolution, SqlWhereOperator } from 'unconventional-pg-queries';
 
@@ -554,6 +554,23 @@ test('buildFilter escapes apostrophes in scalar and list values', () => {
     buildFilter<TestModel>('name', SqlWhereOperator.In, ["O'Brien", 'Alice']),
     "name IN ('O''Brien','Alice')"
   );
+});
+
+test('getOrder keeps the primary field and extracts COALESCE fallbacks', () => {
+  assertEquals(getOrder(TestModel, 'COALESCE(age, city, name) DESC, id ASC'), [
+    { field: 'age', jsonPath: [], direction: 'DESC', coalesce: ['city', 'name'] },
+    { field: 'id', jsonPath: [], direction: 'ASC' }
+  ]);
+  assertEquals(getOrder(TestModel, 'name DESC, age ASC'), [
+    { field: 'name', jsonPath: [], direction: 'DESC' },
+    { field: 'age', jsonPath: [], direction: 'ASC' }
+  ]);
+});
+
+test('getOrder validates COALESCE primary and fallback fields', () => {
+  for (const sort of ['COALESCE(missing, name) DESC', 'COALESCE(age, missing) DESC', 'COALESCE(age) DESC']) {
+    assertThrows(() => getOrder(TestModel, sort));
+  }
 });
 
 // Print summary
