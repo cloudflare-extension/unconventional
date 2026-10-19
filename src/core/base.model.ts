@@ -110,6 +110,7 @@ export class BaseModel extends Document {
       action: SqlAction.Select,
       type: OneOrMany.Many,
       table: this.collection,
+      idField: this.idField,
       expand,
       where,
       order: getOrder(this, config?.sort),
