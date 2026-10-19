@@ -1,3 +1,9 @@
+### 3.1.0 (2026-10-19)
+
+##### New Features
+
+*  Support sorting on multiple fields with accurate cursors ([9d870401](https://github.com/cloudflare-extension/unconventional/commit/9d870401c67b64aa4f6a5d4b44bc5d0fe2cda830))
+
 ## 3.0.0 (2026-09-28)
 
 ### 2.5.0 (2026-09-28)
